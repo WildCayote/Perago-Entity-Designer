@@ -50,8 +50,8 @@ export class ModelController {
   }
 
   @Get(':id/columns/:columnId')
-  getColumn(@Param('id') id: string, @Param('columnId') columnId: string) {
-    return this.modelService.getColumn(id, columnId);
+  getColumn(@Param('id') modelId: string, @Param('columnId') columnId: string) {
+    return this.modelService.getColumn(modelId, columnId);
   }
 
   @Post(':id/columns')

@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ModelModule } from './model/model.module';
 import { Model } from './entities/model.entity';
 import { Columns } from './entities/column.entity';
+import { RelationShip } from './entities/relationship.entity';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { Columns } from './entities/column.entity';
       username: 'postgres',
       password: 'believe&achieve@suchcringe',
       database: 'PeragoEntityDB',
-      entities: [Model, Columns],
+      entities: [Model, Columns, RelationShip],
       synchronize: true,
     }),
     ModelModule,

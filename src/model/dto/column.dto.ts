@@ -1,5 +1,15 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsBoolean, IsIn, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateIf,
+  ValidateNested,
+} from 'class-validator';
+import { CreateRelationDto } from './relation.dto';
+import { Type } from 'class-transformer';
 
 export class CreateColumnDto {
   @ApiProperty()
@@ -14,14 +24,26 @@ export class CreateColumnDto {
   type: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
-  isPrimary: boolean;
+  isPrimary: boolean = false;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
-  isUnique: boolean;
+  isUnique: boolean = false;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsBoolean()
+  isForiegn: boolean = false;
+
+  @ApiProperty()
+  @ValidateIf((obj) => obj.isForiegn)
+  @IsNotEmpty({ message: '' })
+  @ValidateNested()
+  @Type(() => CreateRelationDto)
+  relation?: CreateRelationDto;
 }
 
 export class UpdateColumnDto extends PartialType(CreateColumnDto) {}
