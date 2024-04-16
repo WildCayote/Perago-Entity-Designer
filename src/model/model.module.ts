@@ -5,9 +5,13 @@ import { Model } from 'src/entities/model.entity';
 import { ModelController } from './model.controller';
 import { ModelService } from './model.service';
 import { RelationShip } from 'src/entities/relationship.entity';
+import { CodeGenModule } from 'src/code-gen/code-gen.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Model, Columns, RelationShip])],
+  imports: [
+    TypeOrmModule.forFeature([Model, Columns, RelationShip]),
+    CodeGenModule,
+  ],
   controllers: [ModelController],
   providers: [ModelService],
 })

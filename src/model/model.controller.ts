@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Res,
 } from '@nestjs/common';
 import { ModelService } from './model.service';
 import {
@@ -14,6 +15,7 @@ import {
   UpdateColumnDto,
   UpdateModelDto,
 } from './dto';
+import { Response } from 'express';
 
 @Controller({ path: 'models', version: '1' })
 export class ModelController {
@@ -27,6 +29,20 @@ export class ModelController {
   @Get(':id')
   getModel(@Param('id') id: string) {
     return this.modelService.getModel(id);
+  }
+
+  @Get(':id/extract')
+  async extractModel(@Param('id') id: string, @Res() res: Response) {
+    const codeResponse = await this.modelService.extractModel(id);
+
+    res.set('Content-Type', 'text/typescript');
+    res.attachment(`${codeResponse.fileName}.ts`);
+    res.send(codeResponse.code);
+  }
+
+  @Get('relations/:id')
+  getRelation(@Param('id') relationId: string) {
+    return this.modelService.getRelation(relationId);
   }
 
   @Post()

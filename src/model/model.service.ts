@@ -18,10 +18,13 @@ import {
 import { isInstance } from 'class-validator';
 import { CreateRelationDto } from './dto/relation.dto';
 import { RelationShip } from 'src/entities/relationship.entity';
+import { CodeGenService } from 'src/code-gen/code-gen.service';
 
 @Injectable()
 export class ModelService {
   constructor(
+    private codeGenServices: CodeGenService,
+
     @InjectRepository(Model)
     private modelRepositroy: Repository<Model>,
 
@@ -50,6 +53,31 @@ export class ModelService {
         throw new NotFoundException(
           "The model you were looking for doesn't exist!",
         );
+      else if (isInstance(error, NotFoundException)) throw error;
+    }
+  }
+
+  async extractModel(id: string) {
+    try {
+      // get all columns
+      const columns = await this.columnRepository.find();
+
+      // get all entities
+      const entities = await this.modelRepositroy.find();
+      const entity = await entities.find((item) => item.id == id);
+
+      // pass them to the generator
+      const codes = await this.codeGenServices.generateOutPut(
+        entities,
+        columns,
+      );
+
+      const code = codes[entity.name];
+      const fileName = `${entity.name.toLowerCase()}.entity`;
+
+      return { code, fileName };
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -233,5 +261,9 @@ export class ModelService {
           "The column you are trying to create a relation for doesn't exist!",
         );
     }
+  }
+
+  async getRelation(id: string) {
+    return await this.relationShipRepository.findOne({ where: { id } });
   }
 }

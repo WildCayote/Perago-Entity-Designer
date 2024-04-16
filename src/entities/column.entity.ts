@@ -48,5 +48,5 @@ export class Columns {
     (relationship) => relationship.referencedColumn,
     { eager: true },
   )
-  references: Columns[];
+  references: RelationShip[];
 }
