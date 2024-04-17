@@ -56,7 +56,7 @@ export class ModelController {
   }
 
   @Delete(':id')
-  deleteModle(@Param('id') id: string) {
+  deleteModel(@Param('id') id: string) {
     return this.modelService.deleteModel(id);
   }
 

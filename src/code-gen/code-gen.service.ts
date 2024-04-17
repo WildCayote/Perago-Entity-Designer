@@ -20,14 +20,14 @@ class ImportObject {
 }
 
 interface TemplateHandler {
-  imports: Set<ImportObject>;
+  imports: Map<string, Set<ImportObject>>;
   generate(entities: Model[], columns: Columns[]): Map<string, string>;
-  addImport(dependency: ImportObject): void;
-  getImports(): Set<ImportObject>;
+  addImport(entityName: string, dependency: ImportObject): void;
+  getImports(): Map<string, Set<ImportObject>>;
 }
 
 class PrimaryColumnHandler implements TemplateHandler {
-  imports = new Set<ImportObject>();
+  imports = new Map<string, Set<ImportObject>>([]);
 
   uuidTemplateFunction = handleBars.compile(
     `@PrimaryGeneratedColumn('uuid')\n{{column.name}} : string\n\n`,
@@ -49,13 +49,15 @@ class PrimaryColumnHandler implements TemplateHandler {
             case 'string':
               entityOutPut += this.uuidTemplateFunction({ column });
               this.addImport(
-                new ImportObject('PrimaryGeneratedColumn', 'typeorm'),
+                entity.name,
+                new ImportObject('PrimaryGeneratedColumn', `'typeorm'`),
               );
               break;
             case 'number':
               entityOutPut += this.incremetnTemplateFunction({ column });
               this.addImport(
-                new ImportObject('PrimaryGeneratedColumn', 'typeorm'),
+                entity.name,
+                new ImportObject('PrimaryGeneratedColumn', `'typeorm'`),
               );
               break;
           }
@@ -68,17 +70,19 @@ class PrimaryColumnHandler implements TemplateHandler {
     return map;
   }
 
-  addImport(dependency: ImportObject): void {
-    this.imports.add(dependency);
+  addImport(entityName: string, dependency: ImportObject): void {
+    if (!this.imports[entityName])
+      this.imports[entityName] = new Set<ImportObject>([dependency]);
+    this.imports[entityName].add(dependency);
   }
 
-  getImports(): Set<ImportObject> {
+  getImports(): Map<string, Set<ImportObject>> {
     return this.imports;
   }
 }
 
 class SimpleColumnHandler implements TemplateHandler {
-  imports = new Set<ImportObject>();
+  imports = new Map<string, Set<ImportObject>>([]);
 
   normalColTemplateFunction = handleBars.compile(
     `@Column({ name: '{{column.name}}', unique: {{column.isUnique}} })
@@ -98,7 +102,7 @@ class SimpleColumnHandler implements TemplateHandler {
           !column.isPrimary
         ) {
           entityOutPut += this.normalColTemplateFunction({ column });
-          this.addImport(new ImportObject('Column', 'typeorm'));
+          this.addImport(entity.name, new ImportObject('Column', `'typeorm'`));
         }
       }
 
@@ -108,17 +112,19 @@ class SimpleColumnHandler implements TemplateHandler {
     return map;
   }
 
-  addImport(dependency: ImportObject): void {
-    this.imports.add(dependency);
+  addImport(entityName: string, dependency: ImportObject): void {
+    if (!this.imports[entityName])
+      this.imports[entityName] = new Set<ImportObject>([dependency]);
+    this.imports[entityName].add(dependency);
   }
 
-  getImports(): Set<ImportObject> {
+  getImports(): Map<string, Set<ImportObject>> {
     return this.imports;
   }
 }
 
 class RelationColumnHandler implements TemplateHandler {
-  imports = new Set<ImportObject>();
+  imports = new Map<string, Set<ImportObject>>([]);
 
   oneToOneFunction = handleBars.compile(
     `
@@ -176,9 +182,13 @@ class RelationColumnHandler implements TemplateHandler {
                 relation: column.relation,
               });
 
-              this.addImport(new ImportObject('OneToOne', 'typeorm'));
+              this.addImport(
+                entity.name,
+                new ImportObject('OneToOne', `'typeorm'`),
+              );
 
               this.addImport(
+                entity.name,
                 new ImportObject(
                   referencedModel.name,
                   `./${referencedModel.name.toLocaleLowerCase()}.entity`,
@@ -198,9 +208,13 @@ class RelationColumnHandler implements TemplateHandler {
                 referencedColumn: referencedColumn.name,
               });
 
-              this.addImport(new ImportObject('ManyToOne', 'typeorm'));
+              this.addImport(
+                entity.name,
+                new ImportObject('ManyToOne', `'typeorm'`),
+              );
 
               this.addImport(
+                entity.name,
                 new ImportObject(
                   referencedModel.name,
                   `./${referencedModel.name.toLocaleLowerCase()}.entity`,
@@ -237,12 +251,16 @@ class RelationColumnHandler implements TemplateHandler {
                   referencedEntity: referencedModel.name,
                 });
 
-                this.addImport(new ImportObject('OneToOne', 'typeorm'));
+                this.addImport(
+                  entity.name,
+                  new ImportObject('OneToOne', `'typeorm'`),
+                );
 
                 this.addImport(
+                  entity.name,
                   new ImportObject(
-                    referencedModel.name,
-                    `./${referencedModel.name.toLocaleLowerCase()}.entity`,
+                    referencingModel.name,
+                    `./${referencingModel.name.toLocaleLowerCase()}.entity`,
                   ),
                 );
 
@@ -258,12 +276,16 @@ class RelationColumnHandler implements TemplateHandler {
                 });
 
                 this.addImport(
+                  entity.name,
                   new ImportObject(
-                    referencedModel.name,
-                    `./${referencedModel.name.toLocaleLowerCase()}.entity`,
+                    referencingModel.name,
+                    `./${referencingModel.name.toLocaleLowerCase()}.entity`,
                   ),
                 );
-                this.addImport(new ImportObject('OneToMany', 'typeorm'));
+                this.addImport(
+                  entity.name,
+                  new ImportObject('OneToMany', `'typeorm'`),
+                );
 
                 break;
             }
@@ -277,11 +299,13 @@ class RelationColumnHandler implements TemplateHandler {
     return map;
   }
 
-  addImport(dependency: ImportObject): void {
-    this.imports.add(dependency);
+  addImport(entityName: string, dependency: ImportObject): void {
+    if (!this.imports[entityName])
+      this.imports[entityName] = new Set<ImportObject>([dependency]);
+    this.imports[entityName].add(dependency);
   }
 
-  getImports(): Set<ImportObject> {
+  getImports(): Map<string, Set<ImportObject>> {
     return this.imports;
   }
 }
@@ -302,13 +326,10 @@ export class TemplateHandlerRegistry {
 @Injectable()
 export class CodeGenService {
   private execOrder: string[];
-  private imports: Set<ImportObject>;
+  private imports: Map<string, Set<ImportObject>>;
 
   constructor(private readonly registry: TemplateHandlerRegistry) {
     this.registerDefualtHandlers();
-    this.imports = new Set<ImportObject>([
-      new ImportObject('Entity', 'typeorm'),
-    ]);
   }
 
   private registerDefualtHandlers(): void {
@@ -317,25 +338,58 @@ export class CodeGenService {
     this.registry.registerHandler('primaryCols', new PrimaryColumnHandler());
 
     this.execOrder = ['primaryCols', 'columns', 'relations'];
+    this.imports = new Map<string, Set<ImportObject>>();
   }
 
-  private generateImports() {
-    const dependecyModuleMap: Record<string, any> = {};
+  private async generateImports(
+    entities: Model[],
+    imports: Map<string, Set<ImportObject>>,
+  ) {
+    const dependencyModuleMap = new Map<
+      string,
+      Map<string, Map<string, ImportObject>>
+    >([]);
     const importStatements = handleBars.compile(
-      `import { {{#each items}}{{this}}{{#unless @last}}, {{/unless}}{{/each}} } from {{module}};\n
+      `import { {{#each modules}}{{this}}{{#unless @last}}, {{/unless}}{{/each}} } from {{{dependency}}};\n
 \n`,
     );
 
-    for (const item of this.imports) {
-      if (!dependecyModuleMap[item.dependency]) {
-        dependecyModuleMap[item.dependency] = new Set<string>([item.module]);
+    for (const entity of entities) {
+      const entityName = entity.name;
+      const entityImports = imports[entityName];
+
+      for (const entityImport of entityImports) {
+        // check if the entity is being tracked , if not track it
+        if (!dependencyModuleMap[entityName])
+          dependencyModuleMap[entityName] = new Map<string, any>();
+
+        // check if the dependecy is being tracked , if not track it
+        if (!dependencyModuleMap[entityName][entityImport.dependency])
+          dependencyModuleMap[entityName][entityImport.dependency] =
+            new Set<string>([entityImport.module]);
+        else
+          dependencyModuleMap[entityName][entityImport.dependency].add(
+            entityImport.module,
+          );
       }
-      dependecyModuleMap[item.dependency].add(item.module);
     }
 
-    let result = '';
-    for (const [key, value] of Object.entries(dependecyModuleMap)) {
-      result += importStatements({ items: value, module: key });
+    let result = new Map<string, string>();
+
+    for (let entity of entities) {
+      const entityName = entity.name;
+      const dependencyMap = dependencyModuleMap[entityName];
+
+      for (const dependency of Object.keys(dependencyMap)) {
+        const modules = dependencyMap[dependency];
+
+        if (!result[entityName]) result[entityName] = '';
+
+        result[entityName] += importStatements({
+          modules: modules,
+          dependency: dependency,
+        });
+      }
     }
 
     return result;
@@ -350,15 +404,19 @@ export class {{entityName}} {\n`,
     return classTemplateFunction({ entityName: entityName });
   }
 
-  generateOutPut(entities: Model[], columns: Columns[]) {
+  async generateOutPut(entities: Model[], columns: Columns[]) {
     const codeObject: Record<string, any> = {};
 
-    entities.forEach((entity) => {
+    for (const entity of entities) {
       codeObject[entity.name] = '';
-    });
+      this.imports.set(entity.name, new Set());
+      this.imports
+        .get(entity.name)
+        .add(new ImportObject('Entity', `'typeorm'`));
+    }
 
     for (const handler of this.execOrder) {
-      const templateHandler = this.registry.getHandler(handler);
+      const templateHandler = await this.registry.getHandler(handler);
       const handlerOutPut = templateHandler.generate(entities, columns);
 
       handlerOutPut.forEach((codeString, entity) => {
@@ -366,17 +424,28 @@ export class {{entityName}} {\n`,
       });
 
       // imports
-      const templateImports = templateHandler.getImports();
-      this.imports = new Set([...templateImports, ...this.imports]);
+      const templateImports = await templateHandler.getImports();
+
+      for (const entity of entities) {
+        const entityImports = await templateImports[entity.name];
+
+        if (!this.imports[entity.name])
+          this.imports[entity.name] = new Set([...entityImports]);
+
+        this.imports[entity.name] = new Set([
+          ...entityImports,
+          ...this.imports.get(entity.name),
+        ]);
+      }
     }
 
-    const importCode = this.generateImports();
+    const importCode = await this.generateImports(entities, this.imports);
 
-    for (const [key, value] of Object.entries(codeObject)) {
+    for (const [entityName, value] of Object.entries(codeObject)) {
       let final = '';
-      final += importCode + this.generateClass(key) + value;
+      final += importCode[entityName] + this.generateClass(entityName) + value;
 
-      codeObject[key] = final + '}';
+      codeObject[entityName] = final + '}';
     }
 
     return codeObject;

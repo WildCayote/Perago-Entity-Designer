@@ -6,11 +6,13 @@ import {
   JoinColumn,
   OneToOne,
   OneToMany,
+  Unique,
 } from 'typeorm';
 import { Model } from './model.entity';
 import { RelationShip } from './relationship.entity';
 
 @Entity()
+@Unique(['name', 'modelId'])
 export class Columns {
   @PrimaryGeneratedColumn('uuid')
   id: string;
