@@ -63,7 +63,7 @@ export class ModelService {
     }
   }
 
-  async createProjects(id: string, data: CreateProjectDto) {
+  async createProject(data: CreateProjectDto) {
     try {
       const newProject = this.projectRepository.create(data);
       await this.projectRepository.save([newProject]);

@@ -12,8 +12,10 @@ import { ModelService } from './model.service';
 import {
   CreateColumnDto,
   CreateModelDto,
+  CreateProjectDto,
   UpdateColumnDto,
   UpdateModelDto,
+  UpdateProjectDto,
 } from './dto';
 import { Response } from 'express';
 
@@ -22,16 +24,27 @@ export class ModelController {
   constructor(private modelService: ModelService) {}
 
   @Get('projects')
-  getProjects() {}
+  getProjects() {
+    return this.modelService.getProjects();
+  }
 
   @Post('projects')
-  createProject() {}
+  createProject(@Body() model: CreateProjectDto) {
+    return this.modelService.createProject(model);
+  }
 
   @Patch('projects/:id')
-  updateProject(@Param('id') projectId: string) {}
+  updateProject(
+    @Param('id') projectId: string,
+    @Body() model: UpdateProjectDto,
+  ) {
+    return this.modelService.updateProject(projectId, model);
+  }
 
   @Delete('projects/:id')
-  deleteProject(@Param('id') projectId: string) {}
+  deleteProject(@Param('id') projectId: string) {
+    return this.modelService.deleteProject(projectId  );
+  }
 
   @Get('projects/:id/models')
   getModels(@Param('id') projectId: string) {
