@@ -195,6 +195,10 @@ export class ModelService {
         );
       else if (isInstance(error, ConflictException)) throw error;
       else if (isInstance(error, BadRequestException)) throw error;
+      else if (error.code == '23505')
+        throw new ConflictException(
+          'A column with the same name already exists!',
+        );
     }
   }
 
