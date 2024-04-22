@@ -6,7 +6,6 @@ import { Model } from './entities/model.entity';
 import { Columns } from './entities/column.entity';
 import { RelationShip } from './entities/relationship.entity';
 import { CodeGenModule } from './code-gen/code-gen.module';
-import { Project } from './entities/project.entity';
 
 @Module({
   imports: [
@@ -17,7 +16,7 @@ import { Project } from './entities/project.entity';
       username: 'postgres',
       password: 'believe&achieve@suchcringe',
       database: 'PeragoEntityDB',
-      entities: [Project, Model, Columns, RelationShip],
+      entities: [Model, Columns, RelationShip],
       synchronize: true,
     }),
     ModelModule,
