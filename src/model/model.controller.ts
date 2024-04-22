@@ -21,17 +21,29 @@ import { Response } from 'express';
 export class ModelController {
   constructor(private modelService: ModelService) {}
 
-  @Get()
-  getModels() {
-    return this.modelService.getModels();
+  @Get('projects')
+  getProjects() {}
+
+  @Post('projects')
+  createProject() {}
+
+  @Patch('projects/:id')
+  updateProject(@Param('id') projectId: string) {}
+
+  @Delete('projects/:id')
+  deleteProject(@Param('id') projectId: string) {}
+
+  @Get('projects/:id/models')
+  getModels(@Param('id') projectId: string) {
+    return this.modelService.getModels(projectId);
   }
 
-  @Get(':id')
-  getModel(@Param('id') id: string) {
-    return this.modelService.getModel(id);
+  @Get('projects/:projectId/models/:id')
+  getModel(@Param('projectId') projectId: string, @Param('id') id: string) {
+    return this.modelService.getModel(projectId, id);
   }
 
-  @Get(':id/extract')
+  @Get('projects/:projectId/models/:id/extract')
   async extractModel(@Param('id') id: string, @Res() res: Response) {
     const codeResponse = await this.modelService.extractModel(id);
 
@@ -40,55 +52,63 @@ export class ModelController {
     res.send(codeResponse.code);
   }
 
-  @Get('relations/:id')
-  getRelation(@Param('id') relationId: string) {
-    return this.modelService.getRelation(relationId);
+  @Post('projects/:projectId/models/')
+  createModel(@Param('projectId') projectId, @Body() model: CreateModelDto) {
+    return this.modelService.createModel(projectId, model);
   }
 
-  @Post()
-  createModel(@Body() model: CreateModelDto) {
-    return this.modelService.createModel(model);
+  @Patch('projects/:projectId/models/:modelId')
+  updateModel(
+    @Param('projectId') projectId: string,
+    @Param('id') id: string,
+    @Body() model: UpdateModelDto,
+  ) {
+    return this.modelService.updateModel(projectId, id, model);
   }
 
-  @Patch(':id')
-  updateModel(@Param('id') id: string, @Body() model: UpdateModelDto) {
-    return this.modelService.updateModel(id, model);
+  @Delete('projects/:projectId/models/:modelId')
+  deleteModel(@Param('projectId') projectId: string, @Param('id') id: string) {
+    return this.modelService.deleteModel(projectId, id);
   }
 
-  @Delete(':id')
-  deleteModel(@Param('id') id: string) {
-    return this.modelService.deleteModel(id);
+  @Get('projects/:projectId/models/:modelId/columns')
+  getModelColumns(
+    @Param('projectId') projectId: string,
+    @Param('modelId') id: string,
+  ) {
+    return this.modelService.getColumns(projectId, id);
   }
 
-  @Get(':id/columns')
-  getModelColumns(@Param('id') id: string) {
-    return this.modelService.getColumns(id);
+  @Get('projects/:projectId/models/:modelId/columns/:columnId')
+  getColumn(
+    @Param('projectId') projectId: string,
+    @Param('id') modelId: string,
+    @Param('columnId') columnId: string,
+  ) {
+    return this.modelService.getColumn(projectId, modelId, columnId);
   }
 
-  @Get(':id/columns/:columnId')
-  getColumn(@Param('id') modelId: string, @Param('columnId') columnId: string) {
-    return this.modelService.getColumn(modelId, columnId);
-  }
-
-  @Post(':id/columns')
+  @Post('projects/:projectId/models/:modelId/columns')
   createModelColumn(@Param('id') id: string, @Body() data: CreateColumnDto) {
     return this.modelService.createColumn(id, data);
   }
 
-  @Patch(':id/columns/:columnId')
+  @Patch('projects/:projectId/models/:modelId/columns/:columnId')
   updateModelColumn(
+    @Param('projectId') projectId: string,
     @Param('id') id: string,
     @Param('columnId') columnId: string,
     @Body() data: UpdateColumnDto,
   ) {
-    return this.modelService.updateColumn(id, columnId, data);
+    return this.modelService.updateColumn(projectId, id, columnId, data);
   }
 
-  @Delete(':id/columns/:columnId')
+  @Delete('projects/:projectId/models/:modelId/columns/:columnId')
   deleteModelColumn(
+    @Param('projectId') projectId: string,
     @Param('id') id: string,
     @Param('columnId') columnId: string,
   ) {
-    return this.modelService.deleteColumn(id, columnId);
+    return this.modelService.deleteColumn(projectId, id, columnId);
   }
 }

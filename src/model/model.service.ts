@@ -91,14 +91,16 @@ export class ModelService {
     }
   }
 
-  async getModels() {
-    const models = await this.modelRepositroy.find();
+  async getModels(projectId: string) {
+    const models = await this.modelRepositroy.find({ where: { projectId } });
     return models;
   }
 
-  async getModel(id: string) {
+  async getModel(projectId: string, id: string) {
     try {
-      const model = await this.modelRepositroy.findOne({ where: { id } });
+      const model = await this.modelRepositroy.findOne({
+        where: { id: id, projectId: projectId },
+      });
       if (!model)
         throw new NotFoundException(
           "The model you were looking for doesn't exist!",
@@ -137,9 +139,12 @@ export class ModelService {
     }
   }
 
-  async createModel(data: CreateModelDto) {
+  async createModel(projectId: string, data: CreateModelDto) {
     try {
-      const newModel = this.modelRepositroy.create(data);
+      const newModel = this.modelRepositroy.create({
+        projectId: projectId,
+        ...data,
+      });
       await this.modelRepositroy.save([newModel]);
       return newModel;
     } catch (error) {
@@ -147,33 +152,50 @@ export class ModelService {
     }
   }
 
-  async updateModel(id: string, data: UpdateModelDto) {
+  async updateModel(projectId: string, id: string, data: UpdateModelDto) {
     try {
-      const response = await this.modelRepositroy.update({ id }, { ...data });
+      const response = await this.modelRepositroy.update(
+        { id: id, projectId: projectId },
+        { ...data },
+      );
       return 'Model has been update';
     } catch (error) {
       console.log(error);
     }
   }
 
-  async deleteModel(id: string) {
+  async deleteModel(projectId: string, id: string) {
     try {
-      const response = await this.modelRepositroy.delete({ id });
+      const response = await this.modelRepositroy.delete({
+        id: id,
+        projectId: projectId,
+      });
       return 'model successfuly deleted!';
     } catch (error) {
       console.log(error);
     }
   }
 
-  async getColumns(modelId: string) {
-    const columns = await this.columnRepository.find({
-      where: { modelId },
-    });
-    return columns;
+  async getColumns(projectId: string, modelId: string) {
+    try {
+      // check to see if the model exists
+      await this.getModel(projectId, modelId);
+
+      const columns = await this.columnRepository.find({
+        where: { modelId },
+      });
+
+      return columns;
+    } catch (error) {
+      if (isInstance(error, NotFoundException)) throw error;
+    }
   }
 
-  async getColumn(modelId: string, columnId: string) {
+  async getColumn(projectId: string, modelId: string, columnId: string) {
     try {
+      // check if the model exists
+      await this.getModel(projectId, modelId);
+
       const response = await this.columnRepository.findOne({
         where: { id: columnId, modelId: modelId },
       });
@@ -189,6 +211,7 @@ export class ModelService {
         throw new NotFoundException(
           "The column you are looking for doesn't exist!",
         );
+      if (isInstance(error, NotFoundException)) throw error;
       console.log(error);
     }
   }
@@ -258,9 +281,14 @@ export class ModelService {
     }
   }
 
-  async updateColumn(modelId: string, columnId: string, data: UpdateColumnDto) {
+  async updateColumn(
+    projectId: string,
+    modelId: string,
+    columnId: string,
+    data: UpdateColumnDto,
+  ) {
     try {
-      await this.getColumn(modelId, columnId);
+      await this.getColumn(projectId, modelId, columnId);
 
       if (data.isPrimary) {
         // find values with primary
@@ -292,9 +320,9 @@ export class ModelService {
     }
   }
 
-  async deleteColumn(modelId: string, columnId: string) {
+  async deleteColumn(projectId: string, modelId: string, columnId: string) {
     try {
-      const toBeDeleted = await this.getColumn(modelId, columnId);
+      const toBeDeleted = await this.getColumn(projectId, modelId, columnId);
       await this.columnRepository.delete({ id: columnId });
 
       return 'column successfuly deleted';
