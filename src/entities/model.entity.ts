@@ -1,5 +1,13 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Columns } from './column.entity';
+import { Project } from './project.entity';
 
 @Entity()
 export class Model {
@@ -9,6 +17,13 @@ export class Model {
   @Column({ name: 'name', unique: true })
   name: string;
 
+  @Column({ name: 'projectId' })
+  projectId: string;
+
   @OneToMany((type) => Columns, (columns) => columns.model)
   columns: Columns[];
+
+  @ManyToOne((type) => Project, (project) => project.models)
+  @JoinColumn({ name: 'projectId', referencedColumnName: 'id' })
+  project: Project;
 }
