@@ -10,6 +10,8 @@ import { Repository } from 'typeorm';
 import { Columns } from 'src/entities/column.entity';
 import { Model } from 'src/entities/model.entity';
 import {
+  CreateProjectDto,
+  UpdateProjectDto,
   CreateColumnDto,
   CreateModelDto,
   UpdateColumnDto,
@@ -19,11 +21,15 @@ import { isInstance } from 'class-validator';
 import { CreateRelationDto } from './dto/relation.dto';
 import { RelationShip } from 'src/entities/relationship.entity';
 import { CodeGenService } from 'src/code-gen/code-gen.service';
+import { Project } from 'src/entities/project.entity';
 
 @Injectable()
 export class ModelService {
   constructor(
     private codeGenServices: CodeGenService,
+
+    @InjectRepository(Project)
+    private projectRepository: Repository<Project>,
 
     @InjectRepository(Model)
     private modelRepositroy: Repository<Model>,
@@ -34,6 +40,56 @@ export class ModelService {
     @InjectRepository(RelationShip)
     private relationShipRepository: Repository<RelationShip>,
   ) {}
+
+  async getProjects() {
+    const projects = await this.modelRepositroy.find();
+    return projects;
+  }
+
+  async getProject(id: string) {
+    try {
+      const project = await this.projectRepository.findOne({ where: { id } });
+      if (!project)
+        throw new NotFoundException(
+          "The project you were looking for doesn't exist!",
+        );
+      return project;
+    } catch (error) {
+      if (error.code == '22P02')
+        throw new NotFoundException(
+          "The project you were looking for doesn't exist!",
+        );
+      else if (isInstance(error, NotFoundException)) throw error;
+    }
+  }
+
+  async createProjects(id: string, data: CreateProjectDto) {
+    try {
+      const newProject = this.projectRepository.create(data);
+      await this.projectRepository.save([newProject]);
+      return newProject;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async updateProject(id: string, data: UpdateProjectDto) {
+    try {
+      await this.projectRepository.update({ id }, { ...data });
+      return 'Project has been update';
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async deleteProject(id: string) {
+    try {
+      await this.projectRepository.delete({ id });
+      return 'Project successfuly deleted!';
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   async getModels() {
     const models = await this.modelRepositroy.find();

@@ -5,11 +5,13 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 import { Columns } from './column.entity';
 import { Project } from './project.entity';
 
 @Entity()
+@Unique(['name', 'projectId'])
 export class Model {
   @PrimaryGeneratedColumn('uuid')
   id: string;
