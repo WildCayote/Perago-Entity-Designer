@@ -85,7 +85,7 @@ class SimpleColumnHandler implements TemplateHandler {
   imports = new Map<string, Set<ImportObject>>([]);
 
   normalColTemplateFunction = handleBars.compile(
-    `@Column({ name: '{{column.name}}', unique: {{column.isUnique}} })
+    `@Column({ name: '{{column.name}}', {{#if column.isUnique}}, unique: true{{/if}} })
 {{column.name}} : {{column.type}};
 \n`,
   );
@@ -131,7 +131,7 @@ class RelationColumnHandler implements TemplateHandler {
     @Column({name : '{{column.name}}'})\n
 {{column.name}} : {{column.type}}\n
 @OneToOne((type) => {{referencedEntity}}, ({{ referencedEntity}}) => {{ referencedEntity}}.{{ currentEntity}})\n
-@JoinColumn({name : '{{column.name}}' , eager : {{relation.eager}} , nullable : {{relation.nullable}}})
+@JoinColumn({name : '{{column.name}}' , {{#if relation.eager}} eager : {{relation.eager}} {{/if}} , {{#if relation.nullable}} nullable : {{relation.nullable}}{{/if}} })
 {{relation.joinName}}: {{referencedEntity}}
 \n`,
   );
@@ -148,12 +148,12 @@ class RelationColumnHandler implements TemplateHandler {
     `@Column({ name: '{{column.name}}' })
 {{column.name}}: {{column.type}};
 \n@ManyToOne((type) => {{referencedEntity}}, ({{ referencedEntity}}) => {{ referencedEntity}}.{{ currentEntity }}s)
-@JoinColumn({ name: '{{column.name}}', referencedColumnName: '{{referencedColumn}}' , eager : {{relation.eager}} , nullable : {{relation.nullable}} })
+@JoinColumn({ name: '{{column.name}}', referencedColumnName: '{{referencedColumn}}' , {{#if relation.eager}} eager : {{relation.eager}} {{/if}} , {{#if relation.nullable}} nullable : {{relation.nullable}}{{/if}} })
 {{referencedEntity}}: {{referencedEntity}};
 \n`,
   );
   manyToOneReverseFunction = handleBars.compile(
-    `@OneToMany((type) => {{referencingEntity}},({{referencingEntity}}) => {{referencingEntity}}.{{referencedEntity}},{ eager: {{reference.eager}} },)
+    `@OneToMany((type) => {{referencingEntity}},({{referencingEntity}}) => {{referencingEntity}}.{{referencedEntity}},{ {{#if relation.eager}} eager : {{relation.eager}} {{/if}} },)
 {{referencingEntity}}s : {{referencingEntity}}[];
 \n`,
   );
