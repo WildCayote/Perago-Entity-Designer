@@ -19,21 +19,21 @@ import {
 } from './dto';
 import { Response } from 'express';
 
-@Controller({ path: 'models', version: '1' })
+@Controller({ path: 'projects', version: '1' })
 export class ModelController {
   constructor(private modelService: ModelService) {}
 
-  @Get('projects')
+  @Get()
   getProjects() {
     return this.modelService.getProjects();
   }
 
-  @Post('projects')
+  @Post()
   createProject(@Body() model: CreateProjectDto) {
     return this.modelService.createProject(model);
   }
 
-  @Patch('projects/:id')
+  @Patch(':id')
   updateProject(
     @Param('id') projectId: string,
     @Body() model: UpdateProjectDto,
@@ -41,22 +41,22 @@ export class ModelController {
     return this.modelService.updateProject(projectId, model);
   }
 
-  @Delete('projects/:id')
+  @Delete(':id')
   deleteProject(@Param('id') projectId: string) {
-    return this.modelService.deleteProject(projectId  );
+    return this.modelService.deleteProject(projectId);
   }
 
-  @Get('projects/:id/models')
+  @Get(':id/models')
   getModels(@Param('id') projectId: string) {
     return this.modelService.getModels(projectId);
   }
 
-  @Get('projects/:projectId/models/:id')
+  @Get(':projectId/models/:id')
   getModel(@Param('projectId') projectId: string, @Param('id') id: string) {
     return this.modelService.getModel(projectId, id);
   }
 
-  @Get('projects/:projectId/models/:id/extract')
+  @Get(':projectId/models/:id/extract')
   async extractModel(@Param('id') id: string, @Res() res: Response) {
     const codeResponse = await this.modelService.extractModel(id);
 
@@ -65,12 +65,12 @@ export class ModelController {
     res.send(codeResponse.code);
   }
 
-  @Post('projects/:projectId/models/')
+  @Post(':projectId/models/')
   createModel(@Param('projectId') projectId, @Body() model: CreateModelDto) {
     return this.modelService.createModel(projectId, model);
   }
 
-  @Patch('projects/:projectId/models/:modelId')
+  @Patch(':projectId/models/:modelId')
   updateModel(
     @Param('projectId') projectId: string,
     @Param('id') id: string,
@@ -79,12 +79,12 @@ export class ModelController {
     return this.modelService.updateModel(projectId, id, model);
   }
 
-  @Delete('projects/:projectId/models/:modelId')
+  @Delete(':projectId/models/:modelId')
   deleteModel(@Param('projectId') projectId: string, @Param('id') id: string) {
     return this.modelService.deleteModel(projectId, id);
   }
 
-  @Get('projects/:projectId/models/:modelId/columns')
+  @Get(':projectId/models/:modelId/columns')
   getModelColumns(
     @Param('projectId') projectId: string,
     @Param('modelId') id: string,
@@ -92,7 +92,7 @@ export class ModelController {
     return this.modelService.getColumns(projectId, id);
   }
 
-  @Get('projects/:projectId/models/:modelId/columns/:columnId')
+  @Get(':projectId/models/:modelId/columns/:columnId')
   getColumn(
     @Param('projectId') projectId: string,
     @Param('id') modelId: string,
@@ -101,12 +101,12 @@ export class ModelController {
     return this.modelService.getColumn(projectId, modelId, columnId);
   }
 
-  @Post('projects/:projectId/models/:modelId/columns')
+  @Post(':projectId/models/:modelId/columns')
   createModelColumn(@Param('id') id: string, @Body() data: CreateColumnDto) {
     return this.modelService.createColumn(id, data);
   }
 
-  @Patch('projects/:projectId/models/:modelId/columns/:columnId')
+  @Patch(':projectId/models/:modelId/columns/:columnId')
   updateModelColumn(
     @Param('projectId') projectId: string,
     @Param('id') id: string,
@@ -116,7 +116,7 @@ export class ModelController {
     return this.modelService.updateColumn(projectId, id, columnId, data);
   }
 
-  @Delete('projects/:projectId/models/:modelId/columns/:columnId')
+  @Delete(':projectId/models/:modelId/columns/:columnId')
   deleteModelColumn(
     @Param('projectId') projectId: string,
     @Param('id') id: string,
