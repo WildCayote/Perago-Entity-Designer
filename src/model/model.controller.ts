@@ -63,15 +63,6 @@ export class ModelController {
     return this.modelService.getModel(projectId, id);
   }
 
-  @Get(':projectId/models/:id/extract')
-  async extractModel(@Param('id') id: string, @Res() res: Response) {
-    const codeResponse = await this.modelService.extractModel(id);
-
-    res.set('Content-Type', 'text/typescript');
-    res.attachment(`${codeResponse.fileName}.ts`);
-    res.send(codeResponse.code);
-  }
-
   @Post(':projectId/models/')
   createModel(@Param('projectId') projectId, @Body() model: CreateModelDto) {
     return this.modelService.createModel(projectId, model);

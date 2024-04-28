@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
-import { CodeGenService, TemplateHandlerRegistry } from './code-gen.service';
+
+import { EntityGenService, TemplateHandlerRegistry } from './services';
+
+import { CodeGenService } from './code-gen.service';
 
 @Module({
-  providers: [CodeGenService, TemplateHandlerRegistry],
+  providers: [CodeGenService, TemplateHandlerRegistry, EntityGenService],
   exports: [CodeGenService],
 })
 export class CodeGenModule {}
