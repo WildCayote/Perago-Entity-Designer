@@ -132,11 +132,11 @@ class RelationColumnHandler implements TemplateHandler {
 {{column.name}} : {{column.type}}\n
 @OneToOne((type) => {{referencedEntity}}, ({{ referencedEntity}}) => {{ referencedEntity}}.{{ currentEntity}})\n
 @JoinColumn({name : '{{column.name}}' , {{#if relation.eager}} eager : {{relation.eager}} {{/if}} , {{#if relation.nullable}} nullable : {{relation.nullable}}{{/if}} })
-{{relation.joinName}}: {{referencedEntity}}
+{{referencedEntity}}: {{referencedEntity}}
 \n`,
   );
   onetToOneReverseFunction = handleBars.compile(
-    `@OneToOne((type) => {{referencingEntity}} , ({{ referencingEntity}}) => {{ referencingEntity}}.{{referencedEntity}})
+    `@OneToOne((type) => {{referencingEntity}} , ({{ referencingEntity}}) => {{ referencingEntity}})
 {{ referencingEntity}} : {{referencingEntity}}
 \n`,
   );

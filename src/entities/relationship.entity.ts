@@ -5,10 +5,12 @@ import {
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 import { Columns } from './column.entity';
 
 @Entity()
+@Unique(['columnId', 'referencedColumnId'])
 export class RelationShip {
   @PrimaryGeneratedColumn('uuid')
   id: string;
