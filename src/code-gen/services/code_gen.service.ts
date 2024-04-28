@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Columns } from 'src/entities/column.entity';
 import { Model } from 'src/entities/model.entity';
 
-import { EntityGenService } from './services';
+import { EntityGenService } from '.';
 
 @Injectable()
 export class CodeGenService {
