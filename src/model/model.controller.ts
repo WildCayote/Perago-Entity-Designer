@@ -28,6 +28,13 @@ export class ModelController {
     return this.modelService.getProjects();
   }
 
+  @Get(':projectId/extract')
+  async extractCode(@Param('projectId') projectId) {
+    const codeResponse = await this.modelService.extractModel(projectId);
+
+    return codeResponse;
+  }
+
   @Post()
   createProject(@Body() model: CreateProjectDto) {
     return this.modelService.createProject(model);
@@ -73,14 +80,17 @@ export class ModelController {
   @Patch(':projectId/models/:modelId')
   updateModel(
     @Param('projectId') projectId: string,
-    @Param('id') id: string,
+    @Param('modelId') id: string,
     @Body() model: UpdateModelDto,
   ) {
     return this.modelService.updateModel(projectId, id, model);
   }
 
   @Delete(':projectId/models/:modelId')
-  deleteModel(@Param('projectId') projectId: string, @Param('id') id: string) {
+  deleteModel(
+    @Param('projectId') projectId: string,
+    @Param('modelId') id: string,
+  ) {
     return this.modelService.deleteModel(projectId, id);
   }
 
@@ -102,26 +112,31 @@ export class ModelController {
   }
 
   @Post(':projectId/models/:modelId/columns')
-  createModelColumn(@Param('id') id: string, @Body() data: CreateColumnDto) {
-    return this.modelService.createColumn(id, data);
+  createModelColumn(
+    @Param('projectId') projectId: string,
+    @Param('modelId') modelId: string,
+    @Body()
+    data: CreateColumnDto,
+  ) {
+    return this.modelService.createColumn(modelId, data);
   }
 
   @Patch(':projectId/models/:modelId/columns/:columnId')
   updateModelColumn(
     @Param('projectId') projectId: string,
-    @Param('id') id: string,
+    @Param('modelId') modelId: string,
     @Param('columnId') columnId: string,
     @Body() data: UpdateColumnDto,
   ) {
-    return this.modelService.updateColumn(projectId, id, columnId, data);
+    return this.modelService.updateColumn(projectId, modelId, columnId, data);
   }
 
   @Delete(':projectId/models/:modelId/columns/:columnId')
   deleteModelColumn(
     @Param('projectId') projectId: string,
-    @Param('id') id: string,
+    @Param('modelId') modelId: string,
     @Param('columnId') columnId: string,
   ) {
-    return this.modelService.deleteColumn(projectId, id, columnId);
+    return this.modelService.deleteColumn(projectId, modelId, columnId);
   }
 }

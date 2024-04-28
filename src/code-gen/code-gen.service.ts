@@ -357,20 +357,21 @@ export class CodeGenService {
     for (const entity of entities) {
       const entityName = entity.name;
       const entityImports = imports[entityName];
+      if (entityImports) {
+        for (const entityImport of entityImports) {
+          // check if the entity is being tracked , if not track it
+          if (!dependencyModuleMap[entityName])
+            dependencyModuleMap[entityName] = new Map<string, any>();
 
-      for (const entityImport of entityImports) {
-        // check if the entity is being tracked , if not track it
-        if (!dependencyModuleMap[entityName])
-          dependencyModuleMap[entityName] = new Map<string, any>();
-
-        // check if the dependecy is being tracked , if not track it
-        if (!dependencyModuleMap[entityName][entityImport.dependency])
-          dependencyModuleMap[entityName][entityImport.dependency] =
-            new Set<string>([entityImport.module]);
-        else
-          dependencyModuleMap[entityName][entityImport.dependency].add(
-            entityImport.module,
-          );
+          // check if the dependecy is being tracked , if not track it
+          if (!dependencyModuleMap[entityName][entityImport.dependency])
+            dependencyModuleMap[entityName][entityImport.dependency] =
+              new Set<string>([entityImport.module]);
+          else
+            dependencyModuleMap[entityName][entityImport.dependency].add(
+              entityImport.module,
+            );
+        }
       }
     }
 
@@ -380,15 +381,17 @@ export class CodeGenService {
       const entityName = entity.name;
       const dependencyMap = dependencyModuleMap[entityName];
 
-      for (const dependency of Object.keys(dependencyMap)) {
-        const modules = dependencyMap[dependency];
+      if (dependencyMap) {
+        for (const dependency of Object.keys(dependencyMap)) {
+          const modules = dependencyMap[dependency];
 
-        if (!result[entityName]) result[entityName] = '';
+          if (!result[entityName]) result[entityName] = '';
 
-        result[entityName] += importStatements({
-          modules: modules,
-          dependency: dependency,
-        });
+          result[entityName] += importStatements({
+            modules: modules,
+            dependency: dependency,
+          });
+        }
       }
     }
 
@@ -429,13 +432,15 @@ export class {{entityName}} {\n`,
       for (const entity of entities) {
         const entityImports = await templateImports[entity.name];
 
-        if (!this.imports[entity.name])
-          this.imports[entity.name] = new Set([...entityImports]);
+        if (entityImports) {
+          if (!this.imports[entity.name])
+            this.imports[entity.name] = new Set([...entityImports]);
 
-        this.imports[entity.name] = new Set([
-          ...entityImports,
-          ...this.imports.get(entity.name),
-        ]);
+          this.imports[entity.name] = new Set([
+            ...entityImports,
+            ...this.imports.get(entity.name),
+          ]);
+        }
       }
     }
 

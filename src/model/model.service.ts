@@ -42,7 +42,7 @@ export class ModelService {
   ) {}
 
   async getProjects() {
-    const projects = await this.modelRepositroy.find();
+    const projects = await this.projectRepository.find();
     return projects;
   }
 
@@ -84,7 +84,8 @@ export class ModelService {
 
   async deleteProject(id: string) {
     try {
-      await this.projectRepository.delete({ id });
+      const response = await this.projectRepository.delete({ id });
+      console.log(response);
       return 'Project successfuly deleted!';
     } catch (error) {
       console.log(error);
@@ -115,14 +116,22 @@ export class ModelService {
     }
   }
 
-  async extractModel(id: string) {
+  async extractModel(projectId: string) {
     try {
       // get all columns
-      const columns = await this.columnRepository.find();
+      const allColumns = await this.columnRepository.find();
 
-      // get all entities
-      const entities = await this.modelRepositroy.find();
-      const entity = await entities.find((item) => item.id == id);
+      // get all entities of the project
+      const entities = await this.modelRepositroy.find({
+        where: { projectId: projectId },
+      });
+
+      const entityIds = entities.map((entity) => entity.id);
+
+      // filter columns that belong to the proper entities, i.e entities that belong to the project
+      const columns = allColumns.filter((column) =>
+        entityIds.includes(column.modelId),
+      );
 
       // pass them to the generator
       const codes = await this.codeGenServices.generateOutPut(
@@ -130,10 +139,7 @@ export class ModelService {
         columns,
       );
 
-      const code = codes[entity.name];
-      const fileName = `${entity.name.toLowerCase()}.entity`;
-
-      return { code, fileName };
+      return codes;
     } catch (error) {
       console.log(error);
     }
@@ -158,7 +164,7 @@ export class ModelService {
         { id: id, projectId: projectId },
         { ...data },
       );
-      return 'Model has been update';
+      return 'Model has been updated!';
     } catch (error) {
       console.log(error);
     }
@@ -170,7 +176,7 @@ export class ModelService {
         id: id,
         projectId: projectId,
       });
-      return 'model successfuly deleted!';
+      return 'Model successfuly deleted!';
     } catch (error) {
       console.log(error);
     }
