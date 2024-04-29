@@ -8,6 +8,7 @@ import {
   EntityGenService,
   ControllerGenService,
   ServGenService,
+  ModuleGenService,
 } from './services/index';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class CodeGenService {
     private dtoGenService: DtoGenService,
     private controllerGenService: ControllerGenService,
     private servGenService: ServGenService,
+    private moduleGenService: ModuleGenService,
   ) {}
 
   async generateOutPut(entities: Model[], columns: Columns[]) {
@@ -26,7 +28,6 @@ export class CodeGenService {
       entities,
       columns,
     );
-
     const dtoCode = await this.dtoGenService.generateOutPut(entities, columns);
     const controllerCode = await this.controllerGenService.generateOutPut(
       entities,
@@ -36,11 +37,15 @@ export class CodeGenService {
       entities,
       columns,
     );
-
+    const moduleCode = await this.moduleGenService.generateOutPut(
+      entities,
+      columns,
+    );
     response['entityCode'] = entityCode;
     response['dtoCode'] = dtoCode;
     response['controllerCode'] = controllerCode;
     response['serviceCode'] = serviceCode;
+    response['moduleCode'] = moduleCode;
 
     return response;
   }

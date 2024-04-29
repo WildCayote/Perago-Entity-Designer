@@ -6,6 +6,7 @@ import {
   TemplateHandlerRegistry,
   ControllerGenService,
   ServGenService,
+  ModuleGenService,
 } from './services';
 
 import { CodeGenService } from './code_gen.service';
@@ -18,6 +19,7 @@ import { CodeGenService } from './code_gen.service';
     DtoGenService,
     ControllerGenService,
     ServGenService,
+    ModuleGenService,
   ],
   exports: [CodeGenService],
 })
