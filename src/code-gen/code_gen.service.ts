@@ -9,6 +9,7 @@ import {
   ControllerGenService,
   ServGenService,
   ModuleGenService,
+  AppModuleGenService,
 } from './services';
 
 @Injectable()
@@ -19,6 +20,7 @@ export class CodeGenService {
     private controllerGenService: ControllerGenService,
     private servGenService: ServGenService,
     private moduleGenService: ModuleGenService,
+    private appModuleGenService: AppModuleGenService,
   ) {}
 
   async generateOutPut(entities: Model[], columns: Columns[]) {
@@ -41,11 +43,17 @@ export class CodeGenService {
       entities,
       columns,
     );
+    const appModule = await this.appModuleGenService.generateOutPut(
+      entities,
+      columns,
+    );
+
     response['entityCode'] = entityCode;
     response['dtoCode'] = dtoCode;
     response['controllerCode'] = controllerCode;
     response['serviceCode'] = serviceCode;
     response['moduleCode'] = moduleCode;
+    response['appModule'] = appModule;
 
     return response;
   }

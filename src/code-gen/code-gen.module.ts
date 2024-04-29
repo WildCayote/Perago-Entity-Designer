@@ -7,6 +7,7 @@ import {
   ControllerGenService,
   ServGenService,
   ModuleGenService,
+  AppModuleGenService,
 } from './services';
 
 import { CodeGenService } from './code_gen.service';
@@ -20,6 +21,7 @@ import { CodeGenService } from './code_gen.service';
     ControllerGenService,
     ServGenService,
     ModuleGenService,
+    AppModuleGenService,
   ],
   exports: [CodeGenService],
 })
