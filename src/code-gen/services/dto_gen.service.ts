@@ -19,7 +19,7 @@ class ImportObject {
   }
 }
 
-Injectable();
+@Injectable()
 export class DtoGenService {
   private imports = new Map<string, Set<ImportObject>>();
 

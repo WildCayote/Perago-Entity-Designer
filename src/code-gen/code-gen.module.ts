@@ -5,6 +5,7 @@ import {
   DtoGenService,
   EntityGenService,
   TemplateHandlerRegistry,
+  ControllerGenService,
 } from './services';
 
 @Module({
@@ -13,6 +14,7 @@ import {
     TemplateHandlerRegistry,
     EntityGenService,
     DtoGenService,
+    ControllerGenService,
   ],
   exports: [CodeGenService],
 })
