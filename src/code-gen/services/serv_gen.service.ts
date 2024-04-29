@@ -265,7 +265,76 @@ export class ServGenService {
   private handleDelete(
     relations: Map<string, Set<ReferenceObject>>,
     primaryCols: Map<string, Set<Columns>>,
-  ) {}
+  ) {
+    const simpleDeleteHandler =
+      handleBars.compile(`async delete({{primaryColumn}}: {{primaryType}}) {
+        try {
+          const response = await this.{{entityName}}Repository.delete({ {{primaryColumn}} });
+          return '{{entityName}} successfuly deleted!';
+        } catch (error) {
+        }
+      }`);
+    const complexDeleteHandler =
+      handleBars.compile(`async delete({{foreignColumn}} : {{foreignType}}, {{primaryColumn}}: {{primaryType}}) {
+        try {
+          const response = await this.{{entityName}}Repository.delete({ {{foreignColumn}}, {{primaryColumn}} });
+          return '{{entityName}} successfuly deleted!';
+        } catch (error) {
+        }
+      }`);
+
+    let result = new Map<string, string>();
+
+    for (const [key, value] of primaryCols.entries()) {
+      let currentRelation = relations.get(key);
+      let currentPrimary = value;
+
+      result.set(key, '');
+
+      if (currentRelation.size) {
+        for (let relation of currentRelation.values()) {
+          let primayType = '';
+          for (let col of currentPrimary.values()) {
+            primayType = col.type;
+          }
+
+          let deleteCode = complexDeleteHandler({
+            foreignColumn: relation.foreignColumn,
+            foreignType: relation.foreignType,
+            entityName: relation.entityName,
+            primaryColumn: relation.primaryColumn,
+            primaryType: primayType,
+          });
+
+          let oldCode = result.get(key);
+          oldCode += deleteCode;
+          result.set(key, oldCode);
+        }
+      } else if (currentPrimary.size) {
+        let primaryName = '';
+        let primaryType = '';
+        for (let col of currentPrimary.values()) {
+          primaryName = col.name;
+          primaryType = col.type;
+        }
+        let deleteCode = simpleDeleteHandler({
+          entityName: key,
+          primaryColumn: primaryName,
+          primaryType: primaryType,
+        });
+
+        let oldCode = result.get(key);
+        oldCode += deleteCode;
+        result.set(key, oldCode);
+      } else {
+        throw new InternalServerErrorException(
+          `Your design has a problem , the entity ${key} has a problem!`,
+        );
+      }
+    }
+
+    return result;
+  }
 
   private handleUpdate(
     relations: Map<string, Set<ReferenceObject>>,
@@ -325,7 +394,8 @@ export class ServGenService {
 
     const getCode = this.handleGet(relations, primaryCols);
     const createCode = this.handleCreate(relations, primaryCols);
+    const deleteCode = this.handleDelete(relations, primaryCols);
 
-    console.log(createCode);
+    console.log(deleteCode);
   }
 }

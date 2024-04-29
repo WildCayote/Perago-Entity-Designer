@@ -86,7 +86,6 @@ export class ModelService {
   async deleteProject(id: string) {
     try {
       const response = await this.projectRepository.delete({ id });
-      console.log(response);
       return 'Project successfuly deleted!';
     } catch (error) {
       console.log(error);
