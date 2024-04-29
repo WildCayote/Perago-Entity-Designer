@@ -200,7 +200,67 @@ export class ServGenService {
   private handleCreate(
     relations: Map<string, Set<ReferenceObject>>,
     primaryCols: Map<string, Set<Columns>>,
-  ) {}
+  ) {
+    const simplePostHandler = handleBars.compile(
+      `async create(data : {{entityName}}CreateDto ){
+        try{
+            const newInstance = this.{{entityName}}Repository.create(data);
+            await this.{{entityName}}Repository.save([newInstance]);
+            return newInstance;
+        }catch(error){
+
+        }
+      }\n\n`,
+    );
+    const complexPostHandler =
+      handleBars.compile(`async create({{foreignColumn}} : {{foreignType}} , data : {{entityName}}CreateDto ){
+        try{
+            const newInstance = this.{{entityName}}Repository.create({ {{foreignColumn}} , ...data});
+            await this.{{entityName}}Repository.save([newInstance]);
+            return newInstance;
+        }catch(error){
+
+        }
+      }\n\n`);
+
+    let result = new Map<string, string>();
+
+    for (const [key, value] of primaryCols.entries()) {
+      let currentRelation = relations.get(key);
+      let currentPrimary = value;
+
+      result.set(key, '');
+
+      if (currentRelation.size) {
+        for (let relation of currentRelation.values()) {
+          let postCode = complexPostHandler({
+            referenceName: relation.referenceName,
+            foreignColumn: relation.foreignColumn,
+            foreignType: relation.foreignType,
+            entityName: relation.entityName,
+          });
+
+          let oldCode = result.get(key);
+          oldCode += postCode;
+          result.set(key, oldCode);
+        }
+      } else if (currentPrimary.size) {
+        let postCode = simplePostHandler({
+          entityName: key,
+        });
+
+        let oldCode = result.get(key);
+        oldCode += postCode;
+        result.set(key, oldCode);
+      } else {
+        throw new InternalServerErrorException(
+          `Your design has a problem , the entity ${key} has a problem!`,
+        );
+      }
+    }
+
+    return result;
+  }
 
   private handleDelete(
     relations: Map<string, Set<ReferenceObject>>,
@@ -264,7 +324,8 @@ export class ServGenService {
     }
 
     const getCode = this.handleGet(relations, primaryCols);
+    const createCode = this.handleCreate(relations, primaryCols);
 
-    console.log(getCode);
+    console.log(createCode);
   }
 }
