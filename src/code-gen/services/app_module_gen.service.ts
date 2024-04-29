@@ -120,8 +120,6 @@ export class AppModuleGenService {
 
     const result = importCode['appImports'] + classCode;
 
-    console.log(importCode);
-
     return result;
   }
 }

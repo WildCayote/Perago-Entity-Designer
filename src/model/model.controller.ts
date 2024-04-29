@@ -29,8 +29,15 @@ export class ModelController {
   }
 
   @Get(':projectId/extract')
-  async extractCode(@Param('projectId') projectId) {
+  async extractCode(@Param('projectId') projectId, @Res() res: Response) {
     const codeResponse = await this.modelService.extractModel(projectId);
+
+    // Set response headers
+    res.setHeader('Content-Disposition', 'attachment; filename="src.zip"');
+    res.setHeader('Content-Type', 'application/zip');
+
+    // Send the zip file as a response
+    res.send(codeResponse);
 
     return codeResponse;
   }

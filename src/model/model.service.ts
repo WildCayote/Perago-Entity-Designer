@@ -24,6 +24,10 @@ import { RelationShip } from 'src/entities/relationship.entity';
 import { CodeGenService } from 'src/code-gen/code_gen.service';
 import { Project } from 'src/entities/project.entity';
 
+import * as JSZip from 'jszip';
+import * as fs from 'fs';
+import { arch } from 'os';
+
 @Injectable()
 export class ModelService {
   constructor(
@@ -116,7 +120,7 @@ export class ModelService {
     }
   }
 
-  async extractModel(projectId: string) {
+  async extractModel(projectId: string): Promise<Buffer> {
     try {
       // get all columns
       const allColumns = await this.columnRepository.find();
@@ -139,7 +143,57 @@ export class ModelService {
         columns,
       );
 
-      return codes;
+      // create zip file from the generated code
+      const archive = new JSZip();
+      for (const key of Object.keys(codes)) {
+        let value = '';
+        switch (key) {
+          case 'appModule':
+            value = codes[key];
+            archive.file('app.module.ts', value);
+            break;
+          case 'entityCode':
+            for (const entity of Object.keys(codes[key])) {
+              value = codes[key][entity];
+              archive.file(`entities/${entity.toLowerCase()}.entity.ts`, value);
+            }
+            break;
+          case 'dtoCode':
+            for (const entity of Object.keys(codes[key])) {
+              value = codes[key][entity];
+              archive.file(`dtos/${entity.toLowerCase()}.dto.ts`, value);
+            }
+            break;
+          case 'controllerCode':
+            for (const entity of Object.keys(codes[key])) {
+              value = codes[key][entity];
+              archive.file(
+                `controllers/${entity.toLowerCase()}.controller.ts`,
+                value,
+              );
+            }
+            break;
+          case 'serviceCode':
+            for (const entity of Object.keys(codes[key])) {
+              value = codes[key][entity];
+              archive.file(
+                `services/${entity.toLowerCase()}.services.ts`,
+                value,
+              );
+            }
+            break;
+          case 'moduleCode':
+            for (const entity of Object.keys(codes[key])) {
+              value = codes[key][entity];
+              archive.file(`modules/${entity.toLowerCase()}.module.ts`, value);
+            }
+            break;
+        }
+      }
+
+      const content = await archive.generateAsync({ type: 'nodebuffer' });
+
+      return content;
     } catch (error) {
       console.log(error);
     }
