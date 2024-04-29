@@ -32,6 +32,10 @@ export class CodeGenService {
       entities,
       columns,
     );
+    const serviceCode = await this.servGenService.generateOutPut(
+      entities,
+      columns,
+    );
 
     response['entityCode'] = entityCode;
     response['dtoCode'] = dtoCode;
