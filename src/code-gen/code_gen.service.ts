@@ -40,6 +40,7 @@ export class CodeGenService {
     response['entityCode'] = entityCode;
     response['dtoCode'] = dtoCode;
     response['controllerCode'] = controllerCode;
+    response['serviceCode'] = serviceCode;
 
     return response;
   }

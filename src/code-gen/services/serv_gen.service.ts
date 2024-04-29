@@ -127,7 +127,7 @@ export class ServGenService {
       }\n\n`,
     );
     const simpleGetHandler = handleBars.compile(
-      `async getOne({{primaryCol}} : {{coltype}}) {
+      `async getOne({{primaryCol}} : {{primaryType}}) {
         try{
             const result = await this.{{entityName}}Repository.findOne({where : { {{primaryCol}} : {{primaryCol}} }});
             return result;
@@ -175,13 +175,16 @@ export class ServGenService {
         }
       } else if (currentPrimary.size) {
         let primaryName = '';
+        let primaryType = '';
         for (let col of currentPrimary.values()) {
           primaryName = col.name;
+          primaryType = col.type;
         }
         let getAllCode = simpleGetAllHandler({ entityName: key });
         let getCode = simpleGetHandler({
           entityName: key,
           primaryCol: primaryName,
+          primaryType: primaryType,
         });
 
         let oldCode = result.get(key);
@@ -408,6 +411,23 @@ export class ServGenService {
     return result;
   }
 
+  private generateClass(entityName: string, imports: string, body: string) {
+    const classTemplate = handleBars.compile(
+      `@Injectable()\nexport class {{entityName}}Service {\nconstructor(@InjectRepository({{entityName}})
+        private {{entityName}}Repository: Repository<{{entityName}}>,) {}\n\n`,
+    );
+
+    let result = '';
+    const classHead = classTemplate({ entityName: entityName });
+
+    result += imports;
+    result += classHead;
+    result += body;
+    result += '}';
+
+    return result;
+  }
+
   async generateOutPut(entities: Model[], columns: Columns[]) {
     let relations = new Map<string, Set<ReferenceObject>>();
     let primaryCols = new Map<string, Set<Columns>>();
@@ -463,5 +483,25 @@ export class ServGenService {
     const createCode = this.handleCreate(relations, primaryCols);
     const deleteCode = this.handleDelete(relations, primaryCols);
     const updateCode = this.handleUpdate(relations, primaryCols);
+
+    const importCode = await this.generateImports(entities, this.imports);
+
+    const dataObject = {};
+
+    entities.forEach((entity) => {
+      let entityName = entity.name;
+      let body = '';
+
+      body += getCode.get(entityName);
+      body += createCode.get(entityName);
+      body += updateCode.get(entityName);
+      body += deleteCode.get(entityName);
+
+      let code = this.generateClass(entityName, importCode[entityName], body);
+
+      dataObject[entityName] = code;
+    });
+
+    return dataObject;
   }
 }
