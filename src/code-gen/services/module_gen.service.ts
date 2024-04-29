@@ -105,6 +105,7 @@ export class ModuleGenService {
           new ImportObject('TypeOrmModule', "'@nestjs/typeorm'"),
           new ImportObject(`${entityName}Service`, "'src/services'"),
           new ImportObject(`${entityName}Controller`, "'src/controllers'"),
+          new ImportObject(`${entityName}`, "'src/entities'"),
         ]),
       );
     }

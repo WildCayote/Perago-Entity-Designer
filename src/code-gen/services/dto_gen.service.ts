@@ -112,7 +112,7 @@ export class DtoGenService {
   private async generateFields(entities: Model[], columns: Columns[]) {
     let fields = new Map<string, Set<string>>();
 
-    const fieldTemplate = handleBars.compile('{{name}} : {{type}}\n\n');
+    const fieldTemplate = handleBars.compile('{{name}} : {{type}};\n\n');
 
     for (const entity of entities) {
       const entityId = entity.id;

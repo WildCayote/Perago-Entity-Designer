@@ -8,6 +8,7 @@ import {
   ServGenService,
   ModuleGenService,
   AppModuleGenService,
+  BarrelGenService,
 } from './services';
 
 import { CodeGenService } from './code_gen.service';
@@ -22,7 +23,8 @@ import { CodeGenService } from './code_gen.service';
     ServGenService,
     ModuleGenService,
     AppModuleGenService,
+    BarrelGenService,
   ],
-  exports: [CodeGenService],
+  exports: [CodeGenService, BarrelGenService],
 })
 export class CodeGenModule {}

@@ -27,11 +27,14 @@ import { Project } from 'src/entities/project.entity';
 import * as JSZip from 'jszip';
 import * as fs from 'fs';
 import { arch } from 'os';
+import { BarrelGenService } from 'src/code-gen/services';
 
 @Injectable()
 export class ModelService {
   constructor(
     private codeGenServices: CodeGenService,
+
+    private barrelGenService: BarrelGenService,
 
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
@@ -147,24 +150,37 @@ export class ModelService {
       const archive = new JSZip();
       for (const key of Object.keys(codes)) {
         let value = '';
+        let keysSet: Set<string> = new Set<string>([
+          ...Object.keys(codes[key]).concat([]),
+        ]);
+
+        let barrelData = '';
         switch (key) {
           case 'appModule':
             value = codes[key];
             archive.file('app.module.ts', value);
             break;
           case 'entityCode':
+            barrelData = this.barrelGenService.getExports(keysSet, 'entity');
             for (const entity of Object.keys(codes[key])) {
               value = codes[key][entity];
               archive.file(`entities/${entity.toLowerCase()}.entity.ts`, value);
             }
+            archive.file(`entities/index.ts`, barrelData);
             break;
           case 'dtoCode':
+            barrelData = this.barrelGenService.getExports(keysSet, 'dto');
             for (const entity of Object.keys(codes[key])) {
               value = codes[key][entity];
               archive.file(`dtos/${entity.toLowerCase()}.dto.ts`, value);
             }
+            archive.file('dtos/index.ts', barrelData);
             break;
           case 'controllerCode':
+            barrelData = this.barrelGenService.getExports(
+              keysSet,
+              'controller',
+            );
             for (const entity of Object.keys(codes[key])) {
               value = codes[key][entity];
               archive.file(
@@ -172,21 +188,26 @@ export class ModelService {
                 value,
               );
             }
+            archive.file('controllers/index.ts', barrelData);
             break;
           case 'serviceCode':
+            barrelData = this.barrelGenService.getExports(keysSet, 'service');
             for (const entity of Object.keys(codes[key])) {
               value = codes[key][entity];
               archive.file(
                 `services/${entity.toLowerCase()}.services.ts`,
                 value,
               );
+              archive.file('services/index.ts', barrelData);
             }
             break;
           case 'moduleCode':
+            barrelData = this.barrelGenService.getExports(keysSet, 'module');
             for (const entity of Object.keys(codes[key])) {
               value = codes[key][entity];
               archive.file(`modules/${entity.toLowerCase()}.module.ts`, value);
             }
+            archive.file('modules/index.ts', barrelData);
             break;
         }
       }
