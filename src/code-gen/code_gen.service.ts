@@ -9,7 +9,7 @@ import {
   ControllerGenService,
   ServGenService,
   ModuleGenService,
-} from './services/index';
+} from './services';
 
 @Injectable()
 export class CodeGenService {
