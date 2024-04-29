@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 
 import {
-  CodeGenService,
   DtoGenService,
   EntityGenService,
   TemplateHandlerRegistry,
   ControllerGenService,
+  ServGenService,
 } from './services';
+
+import { CodeGenService } from './code_gen.service';
 
 @Module({
   providers: [
@@ -15,6 +17,7 @@ import {
     EntityGenService,
     DtoGenService,
     ControllerGenService,
+    ServGenService,
   ],
   exports: [CodeGenService],
 })

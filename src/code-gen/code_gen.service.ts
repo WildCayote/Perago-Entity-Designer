@@ -3,8 +3,12 @@ import { Injectable } from '@nestjs/common';
 import { Columns } from 'src/entities/column.entity';
 import { Model } from 'src/entities/model.entity';
 
-import { DtoGenService, EntityGenService } from '.';
-import { ControllerGenService } from './controller_gen.service';
+import {
+  DtoGenService,
+  EntityGenService,
+  ControllerGenService,
+  ServGenService,
+} from './services/index';
 
 @Injectable()
 export class CodeGenService {
@@ -12,6 +16,7 @@ export class CodeGenService {
     private entityGenService: EntityGenService,
     private dtoGenService: DtoGenService,
     private controllerGenService: ControllerGenService,
+    private servGenService: ServGenService,
   ) {}
 
   async generateOutPut(entities: Model[], columns: Columns[]) {

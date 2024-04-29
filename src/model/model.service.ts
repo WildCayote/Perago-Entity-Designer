@@ -20,7 +20,7 @@ import {
 import { isInstance } from 'class-validator';
 import { CreateRelationDto } from './dto/relation.dto';
 import { RelationShip } from 'src/entities/relationship.entity';
-import { CodeGenService } from 'src/code-gen/services';
+import { CodeGenService } from 'src/code-gen/code_gen.service';
 import { Project } from 'src/entities/project.entity';
 
 @Injectable()
