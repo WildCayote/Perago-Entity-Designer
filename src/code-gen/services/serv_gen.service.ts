@@ -293,9 +293,9 @@ export class ServGenService {
 
       if (currentRelation.size) {
         for (let relation of currentRelation.values()) {
-          let primayType = '';
+          let primaryType = '';
           for (let col of currentPrimary.values()) {
-            primayType = col.type;
+            primaryType = col.type;
           }
 
           let deleteCode = complexDeleteHandler({
@@ -303,7 +303,7 @@ export class ServGenService {
             foreignType: relation.foreignType,
             entityName: relation.entityName,
             primaryColumn: relation.primaryColumn,
-            primaryType: primayType,
+            primaryType: primaryType,
           });
 
           let oldCode = result.get(key);
@@ -339,7 +339,74 @@ export class ServGenService {
   private handleUpdate(
     relations: Map<string, Set<ReferenceObject>>,
     primaryCols: Map<string, Set<Columns>>,
-  ) {}
+  ) {
+    const simplePatchHandler =
+      handleBars.compile(`async update({{primaryColumn}}: {{primaryType}}, data: {{entityName}}UpdateDto) {
+        try {
+          await this.{{entityName}}Repository.update({ {{primaryColumn}} }, { ...data });
+          return '{{entityName}} has been update';
+        } catch (error) {}
+      }`);
+    const complexPatchHandler =
+      handleBars.compile(`async update({{foreignColumn}} : {{foreignType}}, {{primaryColumn}}: {{primaryType}}, data: {{entityName}}UpdateDto) {
+        try {
+          await this.{{entityName}}Repository.update({ {{foreignColumn}}, {{primaryColumn}} }, { ...data });
+          return '{{entityName}} has been update';
+        } catch (error) {}
+      }`);
+
+    let result = new Map<string, string>();
+
+    for (const [key, value] of primaryCols.entries()) {
+      let currentRelation = relations.get(key);
+      let currentPrimary = value;
+
+      result.set(key, '');
+
+      if (currentRelation.size) {
+        for (let relation of currentRelation.values()) {
+          let primaryType = '';
+          for (let col of currentPrimary.values()) {
+            primaryType = col.type;
+          }
+
+          let patchCode = complexPatchHandler({
+            entityName: relation.entityName,
+            foreignColumn: relation.foreignColumn,
+            foreignType: relation.foreignType,
+            primaryColumn: relation.primaryColumn,
+            primaryType: primaryType,
+          });
+
+          let oldCode = result.get(key);
+          oldCode += patchCode;
+          result.set(key, oldCode);
+        }
+      } else if (currentPrimary.size) {
+        let primaryName = '';
+        let primaryType = '';
+        for (let col of currentPrimary.values()) {
+          primaryName = col.name;
+          primaryType = col.type;
+        }
+        let patchCode = simplePatchHandler({
+          entityName: key,
+          primaryColumn: primaryName,
+          primaryType: primaryType,
+        });
+
+        let oldCode = result.get(key);
+        oldCode += patchCode;
+        result.set(key, oldCode);
+      } else {
+        throw new InternalServerErrorException(
+          `Your design has a problem , the entity ${key} has a problem!`,
+        );
+      }
+    }
+
+    return result;
+  }
 
   async generateOutPut(entities: Model[], columns: Columns[]) {
     let relations = new Map<string, Set<ReferenceObject>>();
@@ -395,7 +462,6 @@ export class ServGenService {
     const getCode = this.handleGet(relations, primaryCols);
     const createCode = this.handleCreate(relations, primaryCols);
     const deleteCode = this.handleDelete(relations, primaryCols);
-
-    console.log(deleteCode);
+    const updateCode = this.handleUpdate(relations, primaryCols);
   }
 }
