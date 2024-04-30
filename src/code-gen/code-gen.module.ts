@@ -12,6 +12,7 @@ import {
 } from './services';
 
 import { CodeGenService } from './code_gen.service';
+import { MainGenService } from './services/main_gen.service';
 
 @Module({
   providers: [
@@ -24,6 +25,7 @@ import { CodeGenService } from './code_gen.service';
     ModuleGenService,
     AppModuleGenService,
     BarrelGenService,
+    MainGenService,
   ],
   exports: [CodeGenService, BarrelGenService],
 })

@@ -160,6 +160,10 @@ export class ModelService {
             value = codes[key];
             archive.file('app.module.ts', value);
             break;
+          case 'main':
+            value = codes[key];
+            archive.file('main.ts', value);
+            break;
           case 'entityCode':
             barrelData = this.barrelGenService.getExports(keysSet, 'entity');
             for (const entity of Object.keys(codes[key])) {

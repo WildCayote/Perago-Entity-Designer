@@ -11,6 +11,7 @@ import {
   ModuleGenService,
   AppModuleGenService,
 } from './services';
+import { MainGenService } from './services/main_gen.service';
 
 @Injectable()
 export class CodeGenService {
@@ -21,6 +22,7 @@ export class CodeGenService {
     private servGenService: ServGenService,
     private moduleGenService: ModuleGenService,
     private appModuleGenService: AppModuleGenService,
+    private mainGenSerivce: MainGenService,
   ) {}
 
   async generateOutPut(entities: Model[], columns: Columns[]) {
@@ -54,6 +56,7 @@ export class CodeGenService {
     response['serviceCode'] = serviceCode;
     response['moduleCode'] = moduleCode;
     response['appModule'] = appModule;
+    response['main'] = this.mainGenSerivce.generateOutPut();
 
     return response;
   }
