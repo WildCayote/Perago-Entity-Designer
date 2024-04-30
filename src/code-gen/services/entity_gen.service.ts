@@ -187,6 +187,11 @@ class RelationColumnHandler implements TemplateHandler {
             (item) => item.id == referencedColumn.modelId,
           );
 
+          this.addImport(
+            entity.name,
+            new ImportObject('JoinColumn', `'typeorm'`),
+          );
+
           switch (column.relation.type) {
             case 'one-to-one':
               entityOutPut += this.oneToOneFunction({
@@ -425,12 +430,9 @@ export class {{entityName}} {\n`,
 
     for (const entity of entities) {
       codeObject[entity.name] = '';
-      this.imports.set(entity.name, new Set());
-      this.imports
-        .get(entity.name)
-        .add(new ImportObject('Entity', `'typeorm'`));
+      this.imports[entity.name] = new Set();
+      this.imports[entity.name].add(new ImportObject('Entity', `'typeorm'`));
     }
-
     for (const handler of this.execOrder) {
       const templateHandler = await this.registry.getHandler(handler);
       const handlerOutPut = templateHandler.generate(entities, columns);
@@ -443,19 +445,26 @@ export class {{entityName}} {\n`,
       const templateImports = await templateHandler.getImports();
 
       for (const entity of entities) {
-        const entityImports = await templateImports[entity.name];
+        const entityImports =
+          templateImports[entity.name] ?? templateImports.get(entity.name);
 
         if (entityImports) {
-          if (!this.imports[entity.name])
+          if (!this.imports[entity.name]) {
             this.imports[entity.name] = new Set([...entityImports]);
+          } else {
+            let previousImport =
+              this.imports[entity.name] ?? this.imports.get(entity.name);
 
-          this.imports[entity.name] = new Set([
-            ...entityImports,
-            ...this.imports.get(entity.name),
-          ]);
+            this.imports[entity.name] = new Set([
+              ...entityImports,
+              ...previousImport,
+            ]);
+          }
         }
       }
     }
+
+    console.log(this.imports);
 
     const importCode = await this.generateImports(entities, this.imports);
 
