@@ -40,6 +40,19 @@ class ReferenceObject {
 export class ControllerGenService {
   private imports = new Map<string, Set<ImportObject>>();
 
+  _ = handleBars.registerHelper('camelCase', function (str) {
+    const pattern = /[ _-]/;
+    const words = str.split(pattern);
+    const camelCaseWords = words.map((word, index) => {
+      if (index === 0) {
+        return word.toLowerCase();
+      } else {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }
+    });
+    return camelCaseWords.join('');
+  });
+
   private async generateImports(
     entities: Model[],
     imports: Map<string, Set<ImportObject>>,
@@ -100,19 +113,19 @@ export class ControllerGenService {
     primaryCols: Map<string, Set<Columns>>,
   ): Map<string, string> {
     const simpleGetAllHandler = handleBars.compile(
-      `@Get('{{entityName}}s/')\ngetAll{{entityName}}s() { return this.{{entityName}}Service.getAll(); }\n\n`,
+      `@Get('{{entityName}}s/')\ngetAll{{entityName}}s() { return this.{{camelCase entityName}}Service.getAll(); }\n\n`,
     );
 
     const simpleGetHandler = handleBars.compile(
-      `@Get('{{entityName}}s/:{{primaryCol}}')\nget{{entityName}}(@Param('{{primaryCol}}') {{primaryCol}}) { return this.{{entityName}}Service.getOne({{primaryCol}}); }\n\n`,
+      `@Get('{{entityName}}s/:{{primaryCol}}')\nget{{entityName}}(@Param('{{primaryCol}}') {{primaryCol}}) { return this.{{camelCase entityName}}Service.getOne({{primaryCol}}); }\n\n`,
     );
 
     const complexGetAllHandler = handleBars.compile(
-      `@Get('{{referenceName}}s/:{{foreignColumn}}/{{entityName}}s/')\ngetAll{{entityName}}s(@Param('{{foreignColumn}}') {{foreignColumn}}) { return this.{{entityName}}Service.getAll({{foreignColumn}}); }\n\n`,
+      `@Get('{{referenceName}}s/:{{foreignColumn}}/{{entityName}}s/')\ngetAll{{entityName}}s(@Param('{{foreignColumn}}') {{foreignColumn}}) { return this.{{camelCase entityName}}Service.getAll({{foreignColumn}}); }\n\n`,
     );
 
     const complexGetHandler = handleBars.compile(
-      `@Get('{{referenceName}}s/:{{foreignColumn}}/{{entityName}}s/:{{primaryColumn}}')\nget{{entityName}}(@Param('{{foreignColumn}}') {{foreignColumn}} , @Param('{{primaryColumn}}') {{primaryColumn}}) { return this.{{entityName}}Service.getOne({{foreignColumn}} , {{primaryColumn}}); }\n\n`,
+      `@Get('{{referenceName}}s/:{{foreignColumn}}/{{entityName}}s/:{{primaryColumn}}')\nget{{entityName}}(@Param('{{foreignColumn}}') {{foreignColumn}} , @Param('{{primaryColumn}}') {{primaryColumn}}) { return this.{{camelCase entityName}}Service.getOne({{foreignColumn}} , {{primaryColumn}}); }\n\n`,
     );
 
     let result = new Map<string, string>();
@@ -173,10 +186,10 @@ export class ControllerGenService {
     primaryCols: Map<string, Set<Columns>>,
   ) {
     const simplePostHandler = handleBars.compile(
-      `@Post('{{entityName}}s/')\ncreate{{entityName}}(@Body() data : {{entityName}}CreateDto) { return this.{{entityName}}Service.create(data); }\n\n`,
+      `@Post('{{entityName}}s/')\ncreate{{entityName}}(@Body() data : {{entityName}}CreateDto) { return this.{{camelCase entityName}}Service.create(data); }\n\n`,
     );
     const complexPostHandler = handleBars.compile(
-      `@Post('{{referenceName}}s/:{{foreignColumn}}/{{entityName}}s')\ncreate{{entityName}}(@Body() data : {{entityName}}CreateDto , @Param('{{foreignColumn}}') {{foreignColumn}}) { return this.{{entityName}}Service.create({{foreignColumn}} , data); }\n\n`,
+      `@Post('{{referenceName}}s/:{{foreignColumn}}/{{entityName}}s')\ncreate{{entityName}}(@Body() data : {{entityName}}CreateDto , @Param('{{foreignColumn}}') {{foreignColumn}}) { return this.{{camelCase entityName}}Service.create({{foreignColumn}} , data); }\n\n`,
     );
 
     let result = new Map<string, string>();
@@ -226,10 +239,10 @@ export class ControllerGenService {
     primaryCols: Map<string, Set<Columns>>,
   ) {
     const simplePatchHandler = handleBars.compile(
-      `@Patch('{{entityName}}s/:{{primaryCol}}')\nupdate{{entityName}}(@Body() data : {{entityName}}UpdateDto , @Param('{{primaryCol}}') {{primaryCol}}) { return this.{{entityName}}Service.update({{primaryCol}} , data); }\n\n`,
+      `@Patch('{{entityName}}s/:{{primaryCol}}')\nupdate{{entityName}}(@Body() data : {{entityName}}UpdateDto , @Param('{{primaryCol}}') {{primaryCol}}) { return this.{{camelCase entityName}}Service.update({{primaryCol}} , data); }\n\n`,
     );
     const complexPostHandler = handleBars.compile(
-      `@Patch('{{referenceName}}s/:{{foreignColumn}}/{{entityName}}s/:{{primaryCol}}')\nupdate{{entityName}}(@Body() data : {{entityName}}UpdateDto , @Param('{{foreignColumn}}') {{foreignColumn}} , @Param('{{primaryCol}}') {{primaryCol}}) { return this.{{entityName}}Service.update({{foreignColumn}}, {{primaryCol}}, data); }\n\n`,
+      `@Patch('{{referenceName}}s/:{{foreignColumn}}/{{entityName}}s/:{{primaryCol}}')\nupdate{{entityName}}(@Body() data : {{entityName}}UpdateDto , @Param('{{foreignColumn}}') {{foreignColumn}} , @Param('{{primaryCol}}') {{primaryCol}}) { return this.{{camelCase entityName}}Service.update({{foreignColumn}}, {{primaryCol}}, data); }\n\n`,
     );
 
     let result = new Map<string, string>();
@@ -285,10 +298,10 @@ export class ControllerGenService {
     primaryCols: Map<string, Set<Columns>>,
   ) {
     const simpleDeleteHandler = handleBars.compile(
-      `@Delete('{{entityName}}s/:{{primaryCol}}')\ndelete{{entityName}}(@Param('{{primaryCol}}') {{primaryCol}}) { return this.{{entityName}}Service.delete({{primaryCol}}); }\n\n`,
+      `@Delete('{{entityName}}s/:{{primaryCol}}')\ndelete{{entityName}}(@Param('{{primaryCol}}') {{primaryCol}}) { return this.{{camelCase entityName}}Service.delete({{primaryCol}}); }\n\n`,
     );
     const complexDeleteHandler = handleBars.compile(
-      `@Delete('{{referenceName}}s/:{{foreignColumn}}/{{entityName}}s/:{{primaryColumn}}')\ndelete{{entityName}}(@Param('{{foreignColumn}}') {{foreignColumn}} , @Param('{{primaryColumn}}') {{primaryColumn}}) { return this.{{entityName}}Service.delete({{foreignColumn}} , {{primaryColumn}}); }\n\n`,
+      `@Delete('{{referenceName}}s/:{{foreignColumn}}/{{entityName}}s/:{{primaryColumn}}')\ndelete{{entityName}}(@Param('{{foreignColumn}}') {{foreignColumn}} , @Param('{{primaryColumn}}') {{primaryColumn}}) { return this.{{camelCase entityName}}Service.delete({{foreignColumn}} , {{primaryColumn}}); }\n\n`,
     );
 
     let result = new Map<string, string>();
@@ -340,7 +353,7 @@ export class ControllerGenService {
 
   private generateClass(entityName: string, imports: string, body: string) {
     const classTemplate = handleBars.compile(
-      `@Controller()\nexport class {{entityName}}Controller {\nconstructor(private {{entityName}}Service: {{entityName}}Service) {}\n\n`,
+      `@Controller()\nexport class {{entityName}}Controller {\nconstructor(private {{camelCase entityName}}Service: {{entityName}}Service) {}\n\n`,
     );
 
     let result = '';
