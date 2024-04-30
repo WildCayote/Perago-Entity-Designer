@@ -464,8 +464,6 @@ export class {{entityName}} {\n`,
       }
     }
 
-    console.log(this.imports);
-
     const importCode = await this.generateImports(entities, this.imports);
 
     for (const [entityName, value] of Object.entries(codeObject)) {
