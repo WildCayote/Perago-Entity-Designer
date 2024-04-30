@@ -126,18 +126,31 @@ class SimpleColumnHandler implements TemplateHandler {
 class RelationColumnHandler implements TemplateHandler {
   imports = new Map<string, Set<ImportObject>>([]);
 
+  _ = handleBars.registerHelper('camelCase', function (str) {
+    const pattern = /[ _-]/;
+    const words = str.split(pattern);
+    const camelCaseWords = words.map((word, index) => {
+      if (index === 0) {
+        return word.toLowerCase();
+      } else {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }
+    });
+    return camelCaseWords.join('');
+  });
+
   oneToOneFunction = handleBars.compile(
     `
     @Column({name : '{{column.name}}'})\n
 {{column.name}} : {{column.type}}\n
-@OneToOne((type) => {{referencedEntity}}, ({{ referencedEntity}}) => {{ referencedEntity}}.{{ currentEntity}})\n
+@OneToOne((type) => {{referencedEntity}}, ({{camelCase referencedEntity}}) => {{camelCase referencedEntity}}.{{camelCase currentEntity}})\n
 @JoinColumn({name : '{{column.name}}' , {{#if relation.eager}} eager : {{relation.eager}} {{/if}} , {{#if relation.nullable}} nullable : {{relation.nullable}}{{/if}} })
-{{referencedEntity}}: {{referencedEntity}}
+{{camelCase referencedEntity}}: {{referencedEntity}}
 \n`,
   );
   onetToOneReverseFunction = handleBars.compile(
-    `@OneToOne((type) => {{referencingEntity}} , ({{ referencingEntity}}) => {{ referencingEntity}})
-{{ referencingEntity}} : {{referencingEntity}}
+    `@OneToOne((type) => {{referencingEntity}} , ({{camelCase referencingEntity}}) => {{camelCase referencingEntity}})
+{{camelCase referencingEntity}} : {{referencingEntity}}
 \n`,
   );
 
@@ -147,14 +160,14 @@ class RelationColumnHandler implements TemplateHandler {
   manyToOneFunction = handleBars.compile(
     `@Column({ name: '{{column.name}}' })
 {{column.name}}: {{column.type}};
-\n@ManyToOne((type) => {{referencedEntity}}, ({{ referencedEntity}}) => {{ referencedEntity}}.{{ currentEntity }}s)
+\n@ManyToOne((type) => {{referencedEntity}}, ({{camelCase referencedEntity}}) => {{camelCase referencedEntity}}.{{camelCase currentEntity }}s)
 @JoinColumn({ name: '{{column.name}}', referencedColumnName: '{{referencedColumn}}' , {{#if relation.eager}} eager : {{relation.eager}} {{/if}} , {{#if relation.nullable}} nullable : {{relation.nullable}}{{/if}} })
-{{referencedEntity}}: {{referencedEntity}};
+{{camelCase referencedEntity}}: {{referencedEntity}};
 \n`,
   );
   manyToOneReverseFunction = handleBars.compile(
-    `@OneToMany((type) => {{referencingEntity}},({{referencingEntity}}) => {{referencingEntity}}.{{referencedEntity}},{ {{#if relation.eager}} eager : {{relation.eager}} {{/if}} },)
-{{referencingEntity}}s : {{referencingEntity}}[];
+    `@OneToMany((type) => {{referencingEntity}},({{camelCase referencingEntity}}) => {{camelCase referencingEntity}}.{{camelCase referencedEntity}},{ {{#if relation.eager}} eager : {{relation.eager}} {{/if}} },)
+{{camelCase referencingEntity}}s : {{referencingEntity}}[];
 \n`,
   );
 
