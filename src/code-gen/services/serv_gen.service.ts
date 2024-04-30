@@ -43,6 +43,19 @@ Injectable();
 export class ServGenService {
   private imports = new Map<string, Set<ImportObject>>();
 
+  _ = handleBars.registerHelper('camelCase', function (str) {
+    const pattern = /[ _-]/;
+    const words = str.split(pattern);
+    const camelCaseWords = words.map((word, index) => {
+      if (index === 0) {
+        return word.toLowerCase();
+      } else {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }
+    });
+    return camelCaseWords.join('');
+  });
+
   private async generateImports(
     entities: Model[],
     imports: Map<string, Set<ImportObject>>,
@@ -103,12 +116,12 @@ export class ServGenService {
     primaryCols: Map<string, Set<Columns>>,
   ) {
     const simpleGetAllHandler = handleBars.compile(
-      `async getAll(){ return await this.{{entityName}}Repository.find(); }\n\n`,
+      `async getAll(){ return await this.{{camelCase entityName}}Repository.find(); }\n\n`,
     );
     const complexGetAllHandler = handleBars.compile(
-      `async getAll() { 
+      `async getAll({{foreignColumn}} : {{foreignType}}) { 
         try{
-            const result = await this.{{entityName}}.find({where : { {{foreignColumn}} : {{foreignColumn}} } });
+            const result = await this.{{camelCase entityName}}Repository.find({where : { {{foreignColumn}} : {{foreignColumn}} } });
             return result;
         }catch(error){
 
@@ -119,7 +132,7 @@ export class ServGenService {
     const complexGetHandler = handleBars.compile(
       `async getOne( {{foreignColumn}} : {{foreignType}} , {{primaryCol}} : {{coltype}}) {
         try{
-            const result = await this.{{entityName}}Repository.findOne({where : { {{foreignColumn}} : {{foreignColumn}} , {{primaryCol}} : {{primaryCol}} }});
+            const result = await this.{{camelCase entityName}}Repository.findOne({where : { {{foreignColumn}} : {{foreignColumn}} , {{primaryCol}} : {{primaryCol}} }});
             return result;
         }catch(error){
 
@@ -129,7 +142,7 @@ export class ServGenService {
     const simpleGetHandler = handleBars.compile(
       `async getOne({{primaryCol}} : {{primaryType}}) {
         try{
-            const result = await this.{{entityName}}Repository.findOne({where : { {{primaryCol}} : {{primaryCol}} }});
+            const result = await this.{{camelCase entityName}}Repository.findOne({where : { {{primaryCol}} : {{primaryCol}} }});
             return result;
         }catch(error){
 
@@ -207,8 +220,8 @@ export class ServGenService {
     const simplePostHandler = handleBars.compile(
       `async create(data : {{entityName}}CreateDto ){
         try{
-            const newInstance = this.{{entityName}}Repository.create(data);
-            await this.{{entityName}}Repository.save([newInstance]);
+            const newInstance = this.{{camelCase entityName}}Repository.create(data);
+            await this.{{camelCase entityName}}Repository.save([newInstance]);
             return newInstance;
         }catch(error){
 
@@ -218,8 +231,8 @@ export class ServGenService {
     const complexPostHandler =
       handleBars.compile(`async create({{foreignColumn}} : {{foreignType}} , data : {{entityName}}CreateDto ){
         try{
-            const newInstance = this.{{entityName}}Repository.create({ {{foreignColumn}} , ...data});
-            await this.{{entityName}}Repository.save([newInstance]);
+            const newInstance = this.{{camelCase entityName}}Repository.create({ {{foreignColumn}} , ...data});
+            await this.{{camelCase entityName}}Repository.save([newInstance]);
             return newInstance;
         }catch(error){
 
@@ -272,19 +285,19 @@ export class ServGenService {
     const simpleDeleteHandler =
       handleBars.compile(`async delete({{primaryColumn}}: {{primaryType}}) {
         try {
-          const response = await this.{{entityName}}Repository.delete({ {{primaryColumn}} });
+          const response = await this.{{camelCase entityName}}Repository.delete({ {{primaryColumn}} });
           return '{{entityName}} successfuly deleted!';
         } catch (error) {
         }
-      }`);
+      }\n\n`);
     const complexDeleteHandler =
       handleBars.compile(`async delete({{foreignColumn}} : {{foreignType}}, {{primaryColumn}}: {{primaryType}}) {
         try {
-          const response = await this.{{entityName}}Repository.delete({ {{foreignColumn}}, {{primaryColumn}} });
+          const response = await this.{{camelCase entityName}}Repository.delete({ {{foreignColumn}}, {{primaryColumn}} });
           return '{{entityName}} successfuly deleted!';
         } catch (error) {
         }
-      }`);
+      }\n\n`);
 
     let result = new Map<string, string>();
 
@@ -346,17 +359,17 @@ export class ServGenService {
     const simplePatchHandler =
       handleBars.compile(`async update({{primaryColumn}}: {{primaryType}}, data: {{entityName}}UpdateDto) {
         try {
-          await this.{{entityName}}Repository.update({ {{primaryColumn}} }, { ...data });
+          await this.{{camelCase entityName}}Repository.update({ {{primaryColumn}} }, { ...data });
           return '{{entityName}} has been update';
         } catch (error) {}
-      }`);
+      }\n\n`);
     const complexPatchHandler =
       handleBars.compile(`async update({{foreignColumn}} : {{foreignType}}, {{primaryColumn}}: {{primaryType}}, data: {{entityName}}UpdateDto) {
         try {
-          await this.{{entityName}}Repository.update({ {{foreignColumn}}, {{primaryColumn}} }, { ...data });
+          await this.{{camelCase entityName}}Repository.update({ {{foreignColumn}}, {{primaryColumn}} }, { ...data });
           return '{{entityName}} has been update';
         } catch (error) {}
-      }`);
+      }\n\n`);
 
     let result = new Map<string, string>();
 
@@ -414,7 +427,7 @@ export class ServGenService {
   private generateClass(entityName: string, imports: string, body: string) {
     const classTemplate = handleBars.compile(
       `@Injectable()\nexport class {{entityName}}Service {\nconstructor(@InjectRepository({{entityName}})
-        private {{entityName}}Repository: Repository<{{entityName}}>,) {}\n\n`,
+        private {{camelCase entityName}}Repository: Repository<{{entityName}}>,) {}\n\n`,
     );
 
     let result = '';
@@ -444,6 +457,7 @@ export class ServGenService {
         new Set<ImportObject>([
           new ImportObject('Injectable', "'@nestjs/common'"),
           new ImportObject(`InjectRepository`, "'@nestjs/typeorm'"),
+          new ImportObject('Repository', "'typeorm'"),
           new ImportObject(`${entityName}`, "'src/entities'"),
           new ImportObject(`${entityName}CreateDto`, "'src/dtos'"),
           new ImportObject(`${entityName}UpdateDto`, "'src/dtos'"),
