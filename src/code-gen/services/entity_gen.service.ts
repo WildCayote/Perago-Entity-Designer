@@ -235,7 +235,7 @@ class RelationColumnHandler implements TemplateHandler {
                 entity.name,
                 new ImportObject(
                   referencedModel.name,
-                  `./${referencedModel.name.toLocaleLowerCase()}.entity`,
+                  `'./${referencedModel.name.toLocaleLowerCase()}.entity'`,
                 ),
               );
 
