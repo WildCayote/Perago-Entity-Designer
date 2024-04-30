@@ -133,8 +133,8 @@ export class DtoGenService {
           entityName,
           new Set<ImportObject>([
             new ImportObject('IsNotEmpty', "'class-validator'"),
-            new ImportObject('ApiProperty', '@nestjs/swagger'),
-            new ImportObject('PartialType', '@nestjs/swagger'),
+            new ImportObject('ApiProperty', "'@nestjs/swagger'"),
+            new ImportObject('PartialType', "'@nestjs/swagger'"),
           ]),
         );
 
