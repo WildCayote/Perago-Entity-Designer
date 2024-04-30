@@ -143,8 +143,8 @@ class RelationColumnHandler implements TemplateHandler {
     `
     @Column({name : '{{column.name}}'})\n
 {{column.name}} : {{column.type}}\n
-@OneToOne((type) => {{referencedEntity}}, ({{camelCase referencedEntity}}) => {{camelCase referencedEntity}}.{{camelCase currentEntity}})\n
-@JoinColumn({name : '{{column.name}}' , {{#if relation.eager}} eager : {{relation.eager}} {{/if}} , {{#if relation.nullable}} nullable : {{relation.nullable}}{{/if}} })
+@OneToOne((type) => {{referencedEntity}}, ({{camelCase referencedEntity}}) => {{camelCase referencedEntity}}.{{camelCase currentEntity}} , { {{#if relation.eager}} eager : {{relation.eager}} {{/if}} , {{#if relation.nullable}} nullable : {{relation.nullable}}{{/if}} })\n
+@JoinColumn({name : '{{column.name}}' , referencedColumnName: '{{referencedColumn}} })
 {{camelCase referencedEntity}}: {{referencedEntity}}
 \n`,
   );
@@ -160,13 +160,13 @@ class RelationColumnHandler implements TemplateHandler {
   manyToOneFunction = handleBars.compile(
     `@Column({ name: '{{column.name}}' })
 {{column.name}}: {{column.type}};
-\n@ManyToOne((type) => {{referencedEntity}}, ({{camelCase referencedEntity}}) => {{camelCase referencedEntity}}.{{camelCase currentEntity }}s)
-@JoinColumn({ name: '{{column.name}}', referencedColumnName: '{{referencedColumn}}' , {{#if relation.eager}} eager : {{relation.eager}} {{/if}} , {{#if relation.nullable}} nullable : {{relation.nullable}}{{/if}} })
+\n@ManyToOne((type) => {{referencedEntity}}, ({{camelCase referencedEntity}}) => {{camelCase referencedEntity}}.{{camelCase currentEntity }}s , { {{#if relation.eager}} eager : {{relation.eager}} {{/if}} , {{#if relation.nullable}} nullable : {{relation.nullable}}{{/if}} })
+@JoinColumn({ name: '{{column.name}}', referencedColumnName: '{{referencedColumn}}' })
 {{camelCase referencedEntity}}: {{referencedEntity}};
 \n`,
   );
   manyToOneReverseFunction = handleBars.compile(
-    `@OneToMany((type) => {{referencingEntity}},({{camelCase referencingEntity}}) => {{camelCase referencingEntity}}.{{camelCase referencedEntity}},{ {{#if relation.eager}} eager : {{relation.eager}} {{/if}} },)
+    `@OneToMany((type) => {{referencingEntity}},({{camelCase referencingEntity}}) => {{camelCase referencingEntity}}.{{camelCase referencedEntity}} {{#if relation.eager}} , { eager : {{relation.eager}} } {{/if}})
 {{camelCase referencingEntity}}s : {{referencingEntity}}[];
 \n`,
   );
@@ -209,7 +209,7 @@ class RelationColumnHandler implements TemplateHandler {
                 entity.name,
                 new ImportObject(
                   referencedModel.name,
-                  `./${referencedModel.name.toLocaleLowerCase()}.entity`,
+                  `'./${referencedModel.name.toLocaleLowerCase()}.entity'`,
                 ),
               );
 
@@ -297,7 +297,7 @@ class RelationColumnHandler implements TemplateHandler {
                   entity.name,
                   new ImportObject(
                     referencingModel.name,
-                    `./${referencingModel.name.toLocaleLowerCase()}.entity`,
+                    `'./${referencingModel.name.toLocaleLowerCase()}.entity'`,
                   ),
                 );
                 this.addImport(
