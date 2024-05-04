@@ -169,7 +169,6 @@ export class DtoGenService {
         else fields.set(entityName, new Set<string>([field]));
       }
     }
-
     return fields;
   }
 

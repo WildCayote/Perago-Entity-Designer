@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -25,9 +26,9 @@ import { CodeGenService } from 'src/code-gen/code_gen.service';
 import { Project } from 'src/entities/project.entity';
 
 import * as JSZip from 'jszip';
-import * as fs from 'fs';
-import { arch } from 'os';
+
 import { BarrelGenService } from 'src/code-gen/services';
+import { PgBossService } from 'src/pg-boss/pg-boss.service';
 
 @Injectable()
 export class ModelService {
@@ -35,6 +36,8 @@ export class ModelService {
     private codeGenServices: CodeGenService,
 
     private barrelGenService: BarrelGenService,
+
+    private pgBossService: PgBossService,
 
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
@@ -123,13 +126,11 @@ export class ModelService {
     }
   }
 
-  async extractModel(projectId: string): Promise<Buffer> {
+  async extractModel(projectId: string) {
     try {
       const project = await this.projectRepository.findOne({
         where: { id: projectId },
       });
-
-      const projectName = project.name;
 
       // get all columns
       const allColumns = await this.columnRepository.find();
@@ -146,174 +147,29 @@ export class ModelService {
         entityIds.includes(column.modelId),
       );
 
-      // pass them to the generator
-      const codes = await this.codeGenServices.generateOutPut(
-        entities,
-        columns,
-      );
+      // let bigColumns: Columns[] = [];
 
-      // create zip file from the generated code
-      const archive = new JSZip();
-
-      // // add the package.json file
-      // archive.file(
-      //   'package.json',
-      //   `{
-      //   "name": "${projectName}",
-      //   "version": "1.0.0",
-      //   "description": "",
-      //   "main": "index.js",
-      //   "scripts": {
-      //     "build": "nest build",
-      //     "format": "prettier --write \\"src/**/*.ts\\" \\"test/**/*.ts\\"",
-      //     "start": "nest start",
-      //     "start:dev": "nest start --watch",
-      //     "start:debug": "nest start --debug --watch",
-      //     "start:prod": "node dist/main",
-      //     "lint": "eslint \\"{src,apps,libs,test}/**/*.ts\\" --fix",
-      //     "test": "jest",
-      //     "test:watch": "jest --watch",
-      //     "test:cov": "jest --coverage",
-      //     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-      //     "test:e2e": "jest --config ./test/jest-e2e.json"
-      //   },
-      //   "keywords": [],
-      //   "author": "",
-      //   "license": "ISC",
-      //   "dependencies": {
-      //     "@nestjs/common": "^10.3.8",
-      //     "@nestjs/core": "^10.3.8",
-      //     "@nestjs/platform-express": "^10.3.8",
-      //     "@nestjs/swagger": "^7.3.1",
-      //     "@nestjs/typeorm": "^10.0.2",
-      //     "class-transformer": "^0.5.1",
-      //     "class-validator": "^0.14.1",
-      //     "pg": "^8.11.5",
-      //     "reflect-metadata": "^0.2.2",
-      //     "rxjs": "^7.8.1",
-      //     "typeorm": "^0.3.20"
-      //   }
+      // for (const entity of entities) {
+      //   bigColumns = await bigColumns.concat(entity.columns);
       // }
-      // `,
-      // );
 
-      // // add the tsconfig.js
-      // archive.file(
-      //   'tsconfig.js',
-      //   `{
-      //   "compilerOptions": {
-      //     "module": "commonjs",
-      //     "declaration": true,
-      //     "removeComments": true,
-      //     "emitDecoratorMetadata": true,
-      //     "experimentalDecorators": true,
-      //     "allowSyntheticDefaultImports": true,
-      //     "target": "ES2021",
-      //     "sourceMap": true,
-      //     "outDir": "./dist",
-      //     "baseUrl": "./",
-      //     "incremental": true,
-      //     "skipLibCheck": true,
-      //     "strictNullChecks": false,
-      //     "noImplicitAny": false,
-      //     "strictBindCallApply": false,
-      //     "forceConsistentCasingInFileNames": false,
-      //     "noFallthroughCasesInSwitch": false
-      //   }
-      // }
-      // `,
-      // );
+      //testing pg-boss
+      const pgResponse = await this.pgBossService.addJob(entities, columns);
 
-      // // add the tsconfig.build.json
-      // archive.file(
-      //   'tsconfig.build.json',
-      //   `{
-      //   "extends": "./tsconfig.json",
-      //   "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
-      // }
-      // `,
-      // );
+      console.log(`Job Id recieved : ${pgResponse}`);
 
-      for (const key of Object.keys(codes)) {
-        let value = '';
-        let keysSet: Set<string> = new Set<string>([
-          ...Object.keys(codes[key]).concat([]),
-        ]);
-
-        let barrelData = '';
-
-        switch (key) {
-          case 'appModule':
-            value = codes[key];
-            archive.file('src/app.module.ts', value);
-            break;
-          case 'main':
-            value = codes[key];
-            archive.file('src/main.ts', value);
-            break;
-          case 'entityCode':
-            barrelData = this.barrelGenService.getExports(keysSet, 'entity');
-            for (const entity of Object.keys(codes[key])) {
-              value = codes[key][entity];
-              archive.file(
-                `src/entities/${entity.toLowerCase()}.entity.ts`,
-                value,
-              );
-            }
-            archive.file(`src/entities/index.ts`, barrelData);
-            break;
-          case 'dtoCode':
-            barrelData = this.barrelGenService.getExports(keysSet, 'dto');
-            for (const entity of Object.keys(codes[key])) {
-              value = codes[key][entity];
-              archive.file(`src/dtos/${entity.toLowerCase()}.dto.ts`, value);
-            }
-            archive.file('src/dtos/index.ts', barrelData);
-            break;
-          case 'controllerCode':
-            barrelData = this.barrelGenService.getExports(
-              keysSet,
-              'controller',
-            );
-            for (const entity of Object.keys(codes[key])) {
-              value = codes[key][entity];
-              archive.file(
-                `src/controllers/${entity.toLowerCase()}.controller.ts`,
-                value,
-              );
-            }
-            archive.file('src/controllers/index.ts', barrelData);
-            break;
-          case 'serviceCode':
-            barrelData = this.barrelGenService.getExports(keysSet, 'service');
-            for (const entity of Object.keys(codes[key])) {
-              value = codes[key][entity];
-              archive.file(
-                `src/services/${entity.toLowerCase()}.service.ts`,
-                value,
-              );
-              archive.file('src/services/index.ts', barrelData);
-            }
-            break;
-          case 'moduleCode':
-            barrelData = this.barrelGenService.getExports(keysSet, 'module');
-            for (const entity of Object.keys(codes[key])) {
-              value = codes[key][entity];
-              archive.file(
-                `src/modules/${entity.toLowerCase()}.module.ts`,
-                value,
-              );
-            }
-            archive.file('src/modules/index.ts', barrelData);
-            break;
-        }
-      }
-
-      const content = await archive.generateAsync({ type: 'nodebuffer' });
-
-      return content;
+      return { jobId: pgResponse };
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async obtainResult(jobId: string) {
+    try {
+      const result = await this.pgBossService.obtainResult(jobId);
+      return result;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
     }
   }
 

@@ -7,11 +7,13 @@ import { ModelService } from './model.service';
 import { RelationShip } from 'src/entities/relationship.entity';
 import { CodeGenModule } from 'src/code-gen/code-gen.module';
 import { Project } from 'src/entities/project.entity';
+import { PgBossModule } from 'src/pg-boss/pg-boss.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Project, Model, Columns, RelationShip]),
     CodeGenModule,
+    PgBossModule,
   ],
   controllers: [ModelController],
   providers: [ModelService],

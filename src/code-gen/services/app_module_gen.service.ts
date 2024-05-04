@@ -94,7 +94,12 @@ export class AppModuleGenService {
       // add respective modules and entities
       await this.imports
         .get('appImports')
-        .add(new ImportObject(`${entityName}Module`, "'src/modules'"));
+        .add(
+          new ImportObject(
+            `${entityName}Module`,
+            `'src/${entityName}/${entityName.toLowerCase()}.module'`,
+          ),
+        );
 
       await this.imports
         .get('appImports')

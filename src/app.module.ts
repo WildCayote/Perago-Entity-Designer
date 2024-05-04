@@ -7,6 +7,7 @@ import { Columns } from './entities/column.entity';
 import { RelationShip } from './entities/relationship.entity';
 import { CodeGenModule } from './code-gen/code-gen.module';
 import { Project } from './entities/project.entity';
+import { PgBossModule } from './pg-boss/pg-boss.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { Project } from './entities/project.entity';
     }),
     ModelModule,
     CodeGenModule,
+    PgBossModule,
   ],
 })
 export class AppModule {}

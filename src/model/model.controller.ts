@@ -29,17 +29,20 @@ export class ModelController {
   }
 
   @Get(':projectId/extract')
-  async extractCode(@Param('projectId') projectId, @Res() res: Response) {
+  async extractCode(@Param('projectId') projectId) {
     const codeResponse = await this.modelService.extractModel(projectId);
 
-    // Set response headers
+    return codeResponse;
+  }
+
+  @Get(':jobId/obtain')
+  async getResult(@Param('jobId') jobId, @Res() res: Response) {
+    const buffer = await this.modelService.obtainResult(jobId);
+
     res.setHeader('Content-Disposition', 'attachment; filename="src.zip"');
     res.setHeader('Content-Type', 'application/zip');
 
-    // Send the zip file as a response
-    res.send(codeResponse);
-
-    return codeResponse;
+    res.send(buffer);
   }
 
   @Post()

@@ -103,8 +103,8 @@ export class ModuleGenService {
         new Set<ImportObject>([
           new ImportObject('Module', "'@nestjs/common'"),
           new ImportObject('TypeOrmModule', "'@nestjs/typeorm'"),
-          new ImportObject(`${entityName}Service`, "'src/services'"),
-          new ImportObject(`${entityName}Controller`, "'src/controllers'"),
+          new ImportObject(`${entityName}Service`, "'./services'"),
+          new ImportObject(`${entityName}Controller`, "'./controllers'"),
           new ImportObject(`${entityName}`, "'src/entities'"),
         ]),
       );

@@ -459,8 +459,8 @@ export class ServGenService {
           new ImportObject(`InjectRepository`, "'@nestjs/typeorm'"),
           new ImportObject('Repository', "'typeorm'"),
           new ImportObject(`${entityName}`, "'src/entities'"),
-          new ImportObject(`${entityName}CreateDto`, "'src/dtos'"),
-          new ImportObject(`${entityName}UpdateDto`, "'src/dtos'"),
+          new ImportObject(`${entityName}CreateDto`, "'../dtos'"),
+          new ImportObject(`${entityName}UpdateDto`, "'../dtos'"),
         ]),
       );
 

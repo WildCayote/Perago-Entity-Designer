@@ -382,9 +382,9 @@ export class ControllerGenService {
         entityName,
         new Set<ImportObject>([
           new ImportObject('Controller', "'@nestjs/common'"),
-          new ImportObject(`${entityName}Service`, "'src/services'"),
-          new ImportObject(`${entityName}CreateDto`, "'src/dtos'"),
-          new ImportObject(`${entityName}UpdateDto`, "'src/dtos'"),
+          new ImportObject(`${entityName}Service`, "'../services'"),
+          new ImportObject(`${entityName}CreateDto`, "'../dtos'"),
+          new ImportObject(`${entityName}UpdateDto`, "'../dtos'"),
         ]),
       );
 
