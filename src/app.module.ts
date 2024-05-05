@@ -8,6 +8,7 @@ import { RelationShip } from './entities/relationship.entity';
 import { CodeGenModule } from './code-gen/code-gen.module';
 import { Project } from './entities/project.entity';
 import { PgBossModule } from './pg-boss/pg-boss.module';
+import { ProjectModule } from './project/project.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PgBossModule } from './pg-boss/pg-boss.module';
     ModelModule,
     CodeGenModule,
     PgBossModule,
+    ProjectModule,
   ],
 })
 export class AppModule {}

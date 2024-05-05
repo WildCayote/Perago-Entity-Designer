@@ -23,10 +23,10 @@ import { Response } from 'express';
 export class ModelController {
   constructor(private modelService: ModelService) {}
 
-  @Get()
-  getProjects() {
-    return this.modelService.getProjects();
-  }
+  // @Get()
+  // getProjects() {
+  //   return this.modelService.getProjects();
+  // }
 
   @Get(':projectId/extract')
   async extractCode(@Param('projectId') projectId) {
@@ -45,23 +45,23 @@ export class ModelController {
     res.send(buffer);
   }
 
-  @Post()
-  createProject(@Body() model: CreateProjectDto) {
-    return this.modelService.createProject(model);
-  }
+  // @Post()
+  // createProject(@Body() model: CreateProjectDto) {
+  //   return this.modelService.createProject(model);
+  // }
 
-  @Patch(':id')
-  updateProject(
-    @Param('id') projectId: string,
-    @Body() model: UpdateProjectDto,
-  ) {
-    return this.modelService.updateProject(projectId, model);
-  }
+  // @Patch(':id')
+  // updateProject(
+  //   @Param('id') projectId: string,
+  //   @Body() model: UpdateProjectDto,
+  // ) {
+  //   return this.modelService.updateProject(projectId, model);
+  // }
 
-  @Delete(':id')
-  deleteProject(@Param('id') projectId: string) {
-    return this.modelService.deleteProject(projectId);
-  }
+  // @Delete(':id')
+  // deleteProject(@Param('id') projectId: string) {
+  //   return this.modelService.deleteProject(projectId);
+  // }
 
   @Get(':id/models')
   getModels(@Param('id') projectId: string) {
