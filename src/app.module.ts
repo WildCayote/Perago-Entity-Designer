@@ -9,6 +9,7 @@ import { CodeGenModule } from './code-gen/code-gen.module';
 import { Project } from './entities/project.entity';
 import { PgBossModule } from './pg-boss/pg-boss.module';
 import { ProjectModule } from './project/project.module';
+import { ColumnModule } from './column/column.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ProjectModule } from './project/project.module';
     CodeGenModule,
     PgBossModule,
     ProjectModule,
+    ColumnModule,
   ],
 })
 export class AppModule {}
