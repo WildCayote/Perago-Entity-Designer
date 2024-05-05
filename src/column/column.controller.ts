@@ -10,11 +10,11 @@ import {
 import { ColumnService } from './column.service';
 import { CreateColumnDto, UpdateColumnDto } from './dto/column.dto';
 
-@Controller({ version: '1' })
+@Controller({ path: 'models', version: '1' })
 export class ColumnController {
   constructor(private columnService: ColumnService) {}
 
-  @Get('models/:modelId/columns/:columnId')
+  @Get(':modelId/columns/:columnId')
   getColumn(
     @Param('modelId') modelId: string,
     @Param('columnId') columnId: string,
@@ -22,7 +22,7 @@ export class ColumnController {
     return this.columnService.getColumn(modelId, columnId);
   }
 
-  @Post('models/:modelId/columns')
+  @Post(':modelId/columns')
   createModelColumn(
     @Param('modelId') modelId: string,
     @Body()
@@ -31,7 +31,7 @@ export class ColumnController {
     return this.columnService.createColumn(modelId, data);
   }
 
-  @Patch('models/:modelId/columns/:columnId')
+  @Patch(':modelId/columns/:columnId')
   updateModelColumn(
     @Param('modelId') modelId: string,
     @Param('columnId') columnId: string,
@@ -40,7 +40,7 @@ export class ColumnController {
     return this.columnService.updateColumn(modelId, columnId, data);
   }
 
-  @Delete(':projectId/models/:modelId/columns/:columnId')
+  @Delete(':modelId/columns/:columnId')
   deleteModelColumn(
     @Param('modelId') modelId: string,
     @Param('columnId') columnId: string,

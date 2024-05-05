@@ -1,6 +1,4 @@
 import {
-  BadRequestException,
-  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -14,11 +12,8 @@ import { Model } from 'src/entities/model.entity';
 import { CreateModelDto, UpdateModelDto } from './dto';
 import { isInstance } from 'class-validator';
 
-import { RelationShip } from 'src/entities/relationship.entity';
-import { CodeGenService } from 'src/code-gen/code_gen.service';
 import { Project } from 'src/entities/project.entity';
 
-import { BarrelGenService } from 'src/code-gen/services';
 import { PgBossService } from 'src/pg-boss/pg-boss.service';
 
 @Injectable()
