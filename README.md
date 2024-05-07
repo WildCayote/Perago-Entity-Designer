@@ -1,10 +1,15 @@
-<img src = 'readme_images/Fantasy_Soccer_API.png' width='1050'>
+<img src = 'readme_images/Perago_Entity_Designer (1).png' width='1050'>
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+This is a project that intends to create an API that enables to design and create a simple NestJS CRUD api server. 
+
+## Database Design
+The database design can be found below.
+
+<img src ="readme_images/PeragoEntityDesigner-design.jpg" width = '1050' height = '600'>
 
 ## Installation
 
@@ -25,28 +30,8 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Test
+## Dependencies
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
 
 ## License
 
