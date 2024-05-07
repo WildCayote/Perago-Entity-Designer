@@ -2,7 +2,7 @@ import { Controller, Get, Param, Res } from '@nestjs/common';
 import { ExtractorService } from './extractor.service';
 import { Response } from 'express';
 
-@Controller('extractor')
+@Controller({ path: 'extractor', version: '1' })
 export class ExtractorController {
   constructor(private extractionService: ExtractorService) {}
 

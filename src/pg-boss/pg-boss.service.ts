@@ -33,10 +33,16 @@ export class PgBossService {
   }
 
   async addJob(entities: Model[], columns: Columns[]) {
-    let jobId = await this.boss.send('processing_queue', {
-      entities: entities,
-      columns: columns,
-    });
+    let jobId = await this.boss.send(
+      'processing_queue',
+      {
+        entities: entities,
+        columns: columns,
+      },
+      {
+        startAfter: 30,
+      },
+    );
 
     return jobId;
   }
