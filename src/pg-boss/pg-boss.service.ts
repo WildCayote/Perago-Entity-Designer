@@ -10,6 +10,7 @@ import { BarrelGenService } from 'src/code-gen/services';
 
 import { Columns } from 'src/entities/column.entity';
 import { Model } from 'src/entities/model.entity';
+import { PgBossGateway } from './pg-boss.gateway';
 
 @Injectable()
 export class PgBossService {
@@ -17,6 +18,7 @@ export class PgBossService {
   constructor(
     private codeGenService: CodeGenService,
     private barrelGenService: BarrelGenService,
+    private pgBossGateway: PgBossGateway,
   ) {
     this.boss = new PgBoss(
       'postgres://postgres:believe%26achieve%40suchcringe@localhost:5433/PeragoEntityDB',
@@ -58,8 +60,9 @@ export class PgBossService {
           );
 
           // then notify the user to obtain it from the defined enpoint
-          console.log(
-            `Dear user I will send you a notification when your work is done. After that notification you will have 48 hours before I remove your proccessing result permanently !`,
+          this.pgBossGateway.wss.emit(
+            job.id,
+            'The code compilation process has been finished you can now download the code. The output will be removed from the server after 48 hours starting now',
           );
         })
         .catch((reason) => {

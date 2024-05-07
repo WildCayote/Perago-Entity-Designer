@@ -11,6 +11,8 @@ import { PgBossModule } from './pg-boss/pg-boss.module';
 import { ProjectModule } from './project/project.module';
 import { ColumnModule } from './column/column.module';
 
+import { ExtractorModule } from './extractor/extractor.module';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -28,6 +30,7 @@ import { ColumnModule } from './column/column.module';
     PgBossModule,
     ProjectModule,
     ColumnModule,
+    ExtractorModule,
   ],
 })
 export class AppModule {}
