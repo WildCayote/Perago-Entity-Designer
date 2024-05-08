@@ -1,0 +1,35 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import {  Create{{PascalCase ClassName}}Dto, Update{{PascalCase ClassName}}Dto } from '../../dtos/{{kebab-case ClassName}}.dto';
+import { {{PascalCase ClassName}} } from '../../entities/{{kebab-case ClassName}}.entity';
+
+@Injectable()
+export class {{PascalCase ClassName}}Service {
+  constructor(
+    @InjectRepository({{PascalCase ClassName}})
+    private readonly {{camelCase ClassName}}Repository: Repository<{{PascalCase ClassName}}>,
+  ) {}
+
+  async findAll(): Promise<{{PascalCase ClassName}}[]> {
+    return await this.{{camelCase ClassName}}Repository.find();
+  }
+
+  async findOne(id: string){
+    return await this.{{camelCase ClassName}}Repository.findOne({where: { id }});
+  }
+
+  async create({{camelCase ClassName}}Dto: Create{{PascalCase ClassName}}Dto){
+    const {{camelCase ClassName}} = this.{{camelCase ClassName}}Repository.create({{camelCase ClassName}}Dto);
+    return await this.{{camelCase ClassName}}Repository.save({{camelCase ClassName}});
+  }
+
+  async update(id: string, {{camelCase ClassName}}Dto: Update{{PascalCase ClassName}}Dto){
+    return await this.{{camelCase ClassName}}Repository.update(id, {{camelCase ClassName}}Dto);
+    
+  }
+
+  async remove(id: string){
+    await this.{{camelCase ClassName}}Repository.delete(id);
+  }
+}

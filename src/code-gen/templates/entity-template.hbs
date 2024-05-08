@@ -1,0 +1,49 @@
+
+{{#each Relationships}}
+  {{#if (eq RelationshipType "many-to-one")}}
+    import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+    import { {{RelatedEntity}} } from './{{kebab-case RelatedEntity}}.entity'; 
+  {{/if}}
+  {{#if (eq RelationshipType "one-to-one")}}
+    import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
+    import { {{RelatedEntity}} } from './{{kebab-case RelatedEntity}}.entity'; 
+  {{/if}}
+  {{#if (eq RelationshipType "one-to-many")}}
+    import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+    import { {{RelatedEntity}} } from './{{kebab-case RelatedEntity}}.entity'; 
+  {{/if}}
+{{/each}}
+
+
+@Entity()
+export class {{PascalCase ClassName}} {
+
+ @PrimaryGeneratedColumn({{#if (eq PrimaryKeyType "string")}}"uuid"{{else}}"int"{{/if}})
+ {{PrimaryKey}}: {{PrimaryKeyType}};
+
+ {{#each Properties}}
+    @Column({
+      nullable: {{Nullable}},
+      {{#if Unique}}
+      unique: true, 
+      {{/if}}
+    })
+    {{Name}}: {{Type}};
+ {{/each}}
+
+ {{#each Relationships}}
+    {{#if (eq RelationshipType "many-to-one")}}
+    @ManyToOne(() => {{RelatedEntity}}, ({{RelatedEntityLower}}) => {{RelatedEntityLower}}.{{ForeignKey}})
+    {{/if}}
+    {{#if (eq RelationshipType "one-to-one")}}
+    @OneToOne(() => {{RelatedEntity}}, ({{RelatedEntityLower}}) => {{RelatedEntityLower}}.{{ForeignKey}})
+    {{/if}}
+    {{#if (eq RelationshipType "one-to-many")}}
+    @OneToMany(() => {{RelatedEntity}}, ({{RelatedEntityLower}}) => {{RelatedEntityLower}}.{{ForeignKey}})
+    {{/if}}
+    
+    {{Name}}: {{Type}};
+ {{/each}}
+
+
+}
