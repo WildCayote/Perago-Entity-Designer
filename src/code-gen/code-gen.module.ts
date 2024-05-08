@@ -1,32 +1,36 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 import {
-  DtoGenService,
-  EntityGenService,
-  TemplateHandlerRegistry,
-  ControllerGenService,
-  ServGenService,
-  ModuleGenService,
-  AppModuleGenService,
-  BarrelGenService,
+  HandlebarsService,
+  EntitiesService,
+  DtosService,
+  ControllersService,
+  ServicesService,
+  ModulesService,
+  BootstrapService,
 } from './services';
 
-import { CodeGenService } from './code_gen.service';
-import { MainGenService } from './services/main_gen.service';
+import { CodeGenService } from './code-gen.service';
+import { ModelModule } from 'src/model/model.module';
+import { Model } from 'src/entities/model.entity';
+import { RelationShip } from 'src/entities/relationship.entity';
 
 @Module({
-  providers: [
-    CodeGenService,
-    TemplateHandlerRegistry,
-    EntityGenService,
-    DtoGenService,
-    ControllerGenService,
-    ServGenService,
-    ModuleGenService,
-    AppModuleGenService,
-    BarrelGenService,
-    MainGenService,
+  imports: [
+    forwardRef(() => ModelModule),
+    TypeOrmModule.forFeature([Model, RelationShip]),
   ],
-  exports: [CodeGenService, BarrelGenService],
+  providers: [
+    HandlebarsService,
+    EntitiesService,
+    DtosService,
+    ControllersService,
+    ServicesService,
+    ModulesService,
+    BootstrapService,
+    CodeGenService,
+  ],
+  exports: [CodeGenService],
 })
 export class CodeGenModule {}

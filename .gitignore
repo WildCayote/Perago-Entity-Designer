@@ -19,6 +19,9 @@ lerna-debug.log*
 /coverage
 /.nyc_output
 
+# Test outputs
+/src/pg-boss/output
+
 # IDEs and editors
 /.idea
 .project

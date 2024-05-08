@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ModelItem } from 'src/database/model/entities/model.entity';
+import { Model } from 'src/entities/model.entity';
 import { Repository } from 'typeorm';
 import * as fs from 'fs';
-import * as handlebars from 'handlebars';
-import { HandlebarsService } from 'src/handlebars.service';
+
+import { HandlebarsService } from './handlebars.service';
 
 @Injectable()
 export class ModulesService {
@@ -12,8 +12,8 @@ export class ModulesService {
   constructor(
     private readonly handlebarsService: HandlebarsService,
 
-    @InjectRepository(ModelItem)
-    private readonly modelItemRepository: Repository<ModelItem>,
+    @InjectRepository(Model)
+    private readonly modelRepository: Repository<Model>,
   ) {
     this.moduleTemplate = fs.readFileSync(
       'src/code-gen/templates/module-template.hbs',
@@ -41,7 +41,7 @@ export class ModulesService {
   }
 
   async generateByModelId(modelId: string) {
-    const model = await this.modelItemRepository.findOne({
+    const model = await this.modelRepository.findOne({
       where: { id: modelId },
       relations: ['columns'],
     });
@@ -49,7 +49,7 @@ export class ModulesService {
       throw new NotFoundException(`Model with id ${modelId} not found`);
     }
 
-    return this.generateModule(model.modelName);
+    return this.generateModule(model.name);
   }
 
   toPascalCase(str: string): string {

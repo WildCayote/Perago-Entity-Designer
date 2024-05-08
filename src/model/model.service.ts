@@ -14,6 +14,12 @@ export class ModelService {
     private modelRepositroy: Repository<Model>,
   ) {}
 
+  async findAll() {
+    return await this.modelRepositroy.find({
+      relations: ['project', 'columns'],
+    });
+  }
+
   async getModels(projectId: string) {
     const models = await this.modelRepositroy.find({ where: { projectId } });
     return models;

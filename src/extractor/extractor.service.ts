@@ -26,24 +26,7 @@ export class ExtractorService {
       const project = await this.projectRepository.findOne({
         where: { id: projectId },
       });
-
-      // get all columns
-      const allColumns = await this.columnRepository.find();
-
-      // get all entities of the project
-      const entities = await this.modelRepositroy.find({
-        where: { projectId: projectId },
-      });
-
-      const entityIds = entities.map((entity) => entity.id);
-
-      // filter columns that belong to the proper entities, i.e entities that belong to the project
-      const columns = allColumns.filter((column) =>
-        entityIds.includes(column.modelId),
-      );
-
-      //testing pg-boss
-      const pgResponse = await this.pgBossService.addJob(entities, columns);
+      const pgResponse = await this.pgBossService.addJob(projectId);
 
       console.log(`Job Id recieved : ${pgResponse}`);
 

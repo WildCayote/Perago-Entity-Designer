@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ModelItem } from 'src/database/model/entities/model.entity';
 import { Repository } from 'typeorm';
 import * as fs from 'fs';
-import * as handlebars from 'handlebars';
-import { HandlebarsService } from 'src/handlebars.service';
+
+import { Model } from 'src/entities/model.entity';
+import { HandlebarsService } from './handlebars.service';
 
 @Injectable()
 export class ControllersService {
@@ -12,8 +12,8 @@ export class ControllersService {
   constructor(
     private readonly handleBarsService: HandlebarsService,
 
-    @InjectRepository(ModelItem)
-    private readonly modelItemRepository: Repository<ModelItem>,
+    @InjectRepository(Model)
+    private readonly modelRepository: Repository<Model>,
   ) {
     this.controllerTemplate = fs.readFileSync(
       'src/code-gen/templates/controller-template.hbs',
@@ -24,13 +24,13 @@ export class ControllersService {
   generateController(className: string) {
     const controller = {
       ClassName: className,
-      
+
       // DtoClassName: this.toPascalCase(className) + 'Dto',
       // ServiceClassName: className + 'Service',
     };
     return this.handleBarsService.compileTemplate(
       this.controllerTemplate,
-      controller, 
+      controller,
     );
   }
 
@@ -45,14 +45,14 @@ export class ControllersService {
   }
 
   async generateByModelId(modelId: string) {
-    const model = await this.modelItemRepository.findOne({
+    const model = await this.modelRepository.findOne({
       where: { id: modelId },
       relations: ['columns'],
     });
     if (!model) {
       throw new NotFoundException(`Model with id ${modelId} not found`);
     }
-    return this.generateController(model.modelName);
+    return this.generateController(model.name);
   }
 
   toPascalCase(str: string): string {

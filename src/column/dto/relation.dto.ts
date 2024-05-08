@@ -16,11 +16,6 @@ export class CreateRelationDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  joinName: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
   referencedColumnId: string;
 
   @ApiProperty()

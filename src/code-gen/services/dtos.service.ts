@@ -1,18 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ModelItem } from 'src/database/model/entities/model.entity';
 import { Repository } from 'typeorm';
+
 import * as fs from 'fs';
-import * as handlebars from 'handlebars';
-import { HandlebarsService } from 'src/handlebars.service';
+
+import { Model } from 'src/entities/model.entity';
+import { HandlebarsService } from './handlebars.service';
 
 @Injectable()
 export class DtosService {
   private readonly dtoTemplate: string;
   constructor(
     private readonly handlebarsService: HandlebarsService,
-    @InjectRepository(ModelItem)
-    private readonly modelItemRepository: Repository<ModelItem>,
+    @InjectRepository(Model)
+    private readonly modelRepository: Repository<Model>,
   ) {
     this.dtoTemplate = fs.readFileSync(
       'src/code-gen/templates/dto-template.hbs',
@@ -21,7 +22,7 @@ export class DtosService {
   }
 
   async generateByModelId(modelId: string) {
-    const model = await this.modelItemRepository.findOne({
+    const model = await this.modelRepository.findOne({
       where: { id: modelId },
       relations: ['columns'],
     });
@@ -31,7 +32,7 @@ export class DtosService {
 
     const properties = model.columns
       .map(function (column) {
-        if (!column.isPrimaryKey && !column.isForeignKey) {
+        if (!column.isPrimary && !column.isForiegn) {
           return {
             Name: column.name,
             Type: column.type,
@@ -47,7 +48,7 @@ export class DtosService {
       });
 
     const dto = {
-      ClassName: model.modelName,
+      ClassName: model.name,
       Properties: [...properties],
     };
     console.log('dto:', dto);
@@ -55,10 +56,10 @@ export class DtosService {
     return this.handlebarsService.compileTemplate(this.dtoTemplate, dto);
   }
 
-  async generateAllDTOsByProject(projectModels: ModelItem[]) {
+  async generateAllDTOsByProject(projectModels: Model[]) {
     const generatedDTOs = await Promise.all(
       projectModels.map(async (model) => ({
-        [model.modelName]: await this.generateByModelId(model.id),
+        [model.name]: await this.generateByModelId(model.id),
       })),
     );
     return Object.assign({}, ...generatedDTOs);

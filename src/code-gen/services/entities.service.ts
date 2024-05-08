@@ -1,30 +1,26 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ModelItem } from 'src/database/model/entities/model.entity';
+
 import { Repository } from 'typeorm';
 import * as fs from 'fs';
-import * as handlebars from 'handlebars';
-import { RelationItem } from 'src/database/relations/entities/relation.entity';
-import { ColumnItem } from 'src/database/columns/entities/column.entity';
-import { HandlebarsService } from 'src/handlebars.service';
-import { ModelService } from 'src/database/model/model.service';
+
+import { Columns } from 'src/entities/column.entity';
+import { HandlebarsService } from './handlebars.service';
+import { ModelService } from 'src/model/model.service';
+import { RelationShip } from 'src/entities/relationship.entity';
+import { Model } from 'src/entities/model.entity';
 
 @Injectable()
 export class EntitiesService {
   private readonly entityTemplate: string;
-  private allModels: ModelItem[];
+  private allModels: Model[];
 
   constructor(
     private readonly modelService: ModelService,
     private readonly handlebarsService: HandlebarsService,
 
-    // repositories
-    @InjectRepository(ModelItem)
-    private readonly modelItemRepository: Repository<ModelItem>,
-    @InjectRepository(ColumnItem)
-    private readonly columnItemRepository: Repository<ColumnItem>,
-    @InjectRepository(RelationItem)
-    private readonly relationItemRepository: Repository<RelationItem>,
+    @InjectRepository(RelationShip)
+    private readonly relationShipRepository: Repository<RelationShip>,
   ) {
     // get template file
     this.entityTemplate = fs.readFileSync(
@@ -48,7 +44,7 @@ export class EntitiesService {
     }
 
     const properties = model.columns
-      .filter((column) => !column.isPrimaryKey && !column.isForeignKey)
+      .filter((column) => !column.isPrimary && !column.isForiegn)
       .map((column) => ({
         Name: column.name,
         Type: column.type,
@@ -56,13 +52,13 @@ export class EntitiesService {
         Unique: column.isUnique,
       }));
 
-    const primaryKey = model.columns.find((column) => column.isPrimaryKey);
+    const primaryKey = model.columns.find((column) => column.isPrimary);
 
     const relationships = await Promise.all(
       model.columns
-        .filter((column) => column.isForeignKey)
+        .filter((column) => column.isForiegn)
         .map(async (column) => {
-          const relation = await this.relationItemRepository.findOne({
+          const relation = await this.relationShipRepository.findOne({
             where: {
               columnId: column.id,
             },
@@ -74,11 +70,11 @@ export class EntitiesService {
           return {
             ForeignKey: relation.referencedColumn.name,
             RelatedEntity:
-              relatedEntity.modelName.charAt(0).toUpperCase() +
-              relatedEntity.modelName.slice(1),
+              relatedEntity.name.charAt(0).toUpperCase() +
+              relatedEntity.name.slice(1),
             RelatedEntityLower:
-              relatedEntity.modelName.charAt(0).toLowerCase() +
-              relatedEntity.modelName.slice(1),
+              relatedEntity.name.charAt(0).toLowerCase() +
+              relatedEntity.name.slice(1),
             Name: relation.name,
             RelationshipType: relation.type,
             Type: column.type,
@@ -88,9 +84,8 @@ export class EntitiesService {
     console.log('relationships:', relationships);
 
     const table = {
-      ClassName: model.modelName,
-      ClassNameLower:
-        model.modelName.charAt(0).toLowerCase() + model.modelName.slice(1),
+      ClassName: model.name,
+      ClassNameLower: model.name.charAt(0).toLowerCase() + model.name.slice(1),
       PrimaryKey: primaryKey.name,
       PrimaryKeyType: primaryKey.type,
       Properties: properties,
@@ -106,7 +101,7 @@ export class EntitiesService {
     const projectModels = this.allModels.filter(
       (model) => model.project.id === projectId,
     );
-    const projectName = projectModels[0].project.projectName;
+    const projectName = projectModels[0].project.name;
     const projectDescription = projectModels[0].project.description;
 
     if (!projectModels.length) {
@@ -116,7 +111,7 @@ export class EntitiesService {
 
     const generatedEntities = await Promise.all(
       projectModels.map(async (model) => ({
-        [model.modelName]: await this.generateByModelId(model.id),
+        [model.name]: await this.generateByModelId(model.id),
       })),
     );
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { HandlebarsService } from 'src/handlebars.service';
+import { HandlebarsService } from './handlebars.service';
 import * as fs from 'fs';
 
 @Injectable()
@@ -48,16 +48,14 @@ export class BootstrapService {
       projectName,
       projectDescription,
     };
-    const packageJson = this.handlebarsService.compileTemplate( 
+    const packageJson = this.handlebarsService.compileTemplate(
       this.packageJsonTemplate,
       data,
     );
     return packageJson;
   }
-    
 
   generateTsConfig() {
     return this.tsConfigTemplate;
   }
-  
 }

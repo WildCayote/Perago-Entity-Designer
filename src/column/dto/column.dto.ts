@@ -36,6 +36,11 @@ export class CreateColumnDto {
   @ApiProperty()
   @IsOptional()
   @IsBoolean()
+  isNullable: boolean = false;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsBoolean()
   isForiegn: boolean = false;
 
   @ApiProperty()

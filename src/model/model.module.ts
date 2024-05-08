@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Columns } from 'src/entities/column.entity';
 import { Model } from 'src/entities/model.entity';
@@ -12,10 +12,11 @@ import { PgBossModule } from 'src/pg-boss/pg-boss.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Project, Model, Columns, RelationShip]),
-    CodeGenModule,
+    forwardRef(() => CodeGenModule),
     PgBossModule,
   ],
   controllers: [ModelController],
   providers: [ModelService],
+  exports: [ModelService],
 })
 export class ModelModule {}

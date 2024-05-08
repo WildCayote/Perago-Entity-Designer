@@ -27,9 +27,6 @@ export class RelationShip {
   @Column({ name: 'nullable', default: true })
   nullable: boolean;
 
-  @Column({ name: 'joinName' })
-  joinName: string;
-
   @Column({ name: 'columnId' })
   columnId: string;
 
