@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HandlebarsService } from './handlebars.service';
 import * as fs from 'fs';
+import { importPattern } from './import-pattern';
 
 @Injectable()
 export class BootstrapService {
@@ -28,10 +29,16 @@ export class BootstrapService {
     );
   }
 
-  generateAppModule(entities: string[]) {
+  generateAppModule(entities: string[], pattern: string = 'default') {
     const data = {
+      default: pattern === 'default',
       Entities: entities,
+      modulePattern: importPattern[pattern].appModule.modulePattern,
+      entityPattern: importPattern[pattern].appModule.entityPattern,
     };
+
+    console.log('App Module: (pattern)', data);
+
     const template = this.handlebarsService.compileTemplate(
       this.appModuleTemplate,
       data,

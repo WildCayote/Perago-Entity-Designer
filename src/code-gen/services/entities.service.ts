@@ -1,18 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
+import { Model } from 'src/entities/model.entity';
 import { Repository } from 'typeorm';
 import * as fs from 'fs';
-
+import * as handlebars from 'handlebars';
+import { RelationShip } from 'src/entities/relationship.entity';
 import { Columns } from 'src/entities/column.entity';
 import { HandlebarsService } from './handlebars.service';
 import { ModelService } from 'src/model/model.service';
-import { RelationShip } from 'src/entities/relationship.entity';
-import { Model } from 'src/entities/model.entity';
 
 @Injectable()
 export class EntitiesService {
   private readonly entityTemplate: string;
+  private readonly barrelTemplate: string;
   private allModels: Model[];
 
   constructor(
@@ -20,11 +20,15 @@ export class EntitiesService {
     private readonly handlebarsService: HandlebarsService,
 
     @InjectRepository(RelationShip)
-    private readonly relationShipRepository: Repository<RelationShip>,
+    private readonly relationItemRepository: Repository<RelationShip>,
   ) {
     // get template file
     this.entityTemplate = fs.readFileSync(
       'src/code-gen/templates/entity-template.hbs',
+      'utf8',
+    );
+    this.barrelTemplate = fs.readFileSync(
+      'src/code-gen/templates/barrel-template.hbs',
       'utf8',
     );
   }
@@ -58,7 +62,7 @@ export class EntitiesService {
       model.columns
         .filter((column) => column.isForiegn)
         .map(async (column) => {
-          const relation = await this.relationShipRepository.findOne({
+          const relation = await this.relationItemRepository.findOne({
             where: {
               columnId: column.id,
             },
@@ -119,5 +123,32 @@ export class EntitiesService {
       Object.assign({ projectModels: projectModels }, ...generatedEntities),
       { projectName, projectDescription },
     ];
+  }
+
+  generateBarrel(classNames: string[]) {
+    const barrel = {
+      files: classNames.map((className) => className + '.entity'),
+    };
+    return this.handlebarsService.compileTemplate(this.barrelTemplate, barrel);
+  }
+
+  toCamelCase(str: string): string {
+    if (/^[a-z][a-zA-Z0-9]*$/.test(str)) {
+      return str;
+    }
+
+    // Split the string into words
+    const words = str.split(/\s+/);
+
+    // Convert the first word to lowercase and capitalize the first letter of subsequent words
+    const camelCaseStr = words
+      .map((word, index) =>
+        index === 0
+          ? word.toLowerCase()
+          : word.charAt(0).toUpperCase() + word.slice(1),
+      )
+      .join('');
+
+    return camelCaseStr;
   }
 }

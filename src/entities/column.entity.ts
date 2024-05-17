@@ -26,7 +26,7 @@ export class Columns {
   @Column({ name: 'is_primary', default: false })
   isPrimary: boolean;
 
-  @Column({ default: true })
+  @Column({ default: false })
   isNullable: boolean;
 
   @Column({ name: 'is_foriegn', default: false })

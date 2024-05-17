@@ -16,7 +16,7 @@ export class Model {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'name', unique: true })
+  @Column({ name: 'name' })
   name: string;
 
   @Column({ name: 'projectId' })

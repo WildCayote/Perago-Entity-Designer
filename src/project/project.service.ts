@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isInstance } from 'class-validator';
 import { Repository } from 'typeorm';
@@ -13,7 +17,6 @@ export class ProjectService {
     private projectRepository: Repository<Project>,
   ) {}
 
-  
   async getProjects() {
     const projects = await this.projectRepository.find();
     return projects;
@@ -42,7 +45,7 @@ export class ProjectService {
       await this.projectRepository.save([newProject]);
       return newProject;
     } catch (error) {
-      console.log(error);
+      throw new InternalServerErrorException(error);
     }
   }
 
@@ -51,7 +54,7 @@ export class ProjectService {
       await this.projectRepository.update({ id }, { ...data });
       return 'Project has been update';
     } catch (error) {
-      console.log(error);
+      throw new InternalServerErrorException(error);
     }
   }
 
@@ -60,7 +63,7 @@ export class ProjectService {
       const response = await this.projectRepository.delete({ id });
       return 'Project successfuly deleted!';
     } catch (error) {
-      console.log(error);
+      throw new InternalServerErrorException(error);
     }
   }
 }

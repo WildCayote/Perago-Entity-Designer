@@ -1,15 +1,15 @@
-
+import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
 {{#each Relationships}}
   {{#if (eq RelationshipType "many-to-one")}}
-    import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+  import { ManyToOne } from 'typeorm';
     import { {{RelatedEntity}} } from './{{kebab-case RelatedEntity}}.entity'; 
   {{/if}}
   {{#if (eq RelationshipType "one-to-one")}}
-    import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
+  import { OneToOne } from 'typeorm';
     import { {{RelatedEntity}} } from './{{kebab-case RelatedEntity}}.entity'; 
   {{/if}}
   {{#if (eq RelationshipType "one-to-many")}}
-    import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+  import { OneToMany } from 'typeorm';
     import { {{RelatedEntity}} } from './{{kebab-case RelatedEntity}}.entity'; 
   {{/if}}
 {{/each}}
@@ -18,8 +18,11 @@
 @Entity()
 export class {{PascalCase ClassName}} {
 
- @PrimaryGeneratedColumn({{#if (eq PrimaryKeyType "string")}}"uuid"{{else}}"int"{{/if}})
- {{PrimaryKey}}: {{PrimaryKeyType}};
+  {{#if PrimaryKey}}
+  @PrimaryGeneratedColumn({{#if (eq PrimaryKeyType "string")}}"uuid"{{else}}"int"{{/if}})
+  {{camelCase PrimaryKey}}: {{PrimaryKeyType}};
+  {{/if}}
+  
 
  {{#each Properties}}
     @Column({
@@ -28,7 +31,7 @@ export class {{PascalCase ClassName}} {
       unique: true, 
       {{/if}}
     })
-    {{Name}}: {{Type}};
+    {{ camelCase Name}}: {{Type}};
  {{/each}}
 
  {{#each Relationships}}
@@ -42,8 +45,6 @@ export class {{PascalCase ClassName}} {
     @OneToMany(() => {{RelatedEntity}}, ({{RelatedEntityLower}}) => {{RelatedEntityLower}}.{{ForeignKey}})
     {{/if}}
     
-    {{Name}}: {{Type}};
+    {{camelCase Name}}: {{Type}};
  {{/each}}
-
-
 }

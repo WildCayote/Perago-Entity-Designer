@@ -3,27 +3,35 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Model } from 'src/entities/model.entity';
 import { Repository } from 'typeorm';
 import * as fs from 'fs';
-
+import * as handlebars from 'handlebars';
 import { HandlebarsService } from './handlebars.service';
+import { importPattern } from './import-pattern';
 
 @Injectable()
 export class ServicesService {
   private readonly serviceTemplate: string;
+  private readonly barrelTemplate: string;
   constructor(
     private readonly handlebarsService: HandlebarsService,
 
     @InjectRepository(Model)
-    private readonly modelRepository: Repository<Model>,
+    private readonly modelItemRepository: Repository<Model>,
   ) {
     this.serviceTemplate = fs.readFileSync(
       'src/code-gen/templates/service-template.hbs',
       'utf8',
     );
+    this.barrelTemplate = fs.readFileSync(
+      'src/code-gen/templates/barrel-template.hbs',
+      'utf8',
+    );
   }
 
-  generateService(className: string) {
+  generateService(className: string, pattern: string = 'default') {
     const service = {
       ClassName: className,
+      dtoPattern: importPattern[pattern].service.dtoPattern,
+      entityPattern: importPattern[pattern].service.entityPattern,
     };
     return this.handlebarsService.compileTemplate(
       this.serviceTemplate,
@@ -31,18 +39,18 @@ export class ServicesService {
     );
   }
 
-  generateServices(classNames: string[]) {
+  generateServices(classNames: string[], pattern: string = 'default') {
     const generatedServices = {};
 
     classNames.forEach((className) => {
-      generatedServices[className] = this.generateService(className);
+      generatedServices[className] = this.generateService(className, pattern);
     });
 
     return generatedServices;
   }
 
   async getServicesByModelId(modelId: string) {
-    const model = await this.modelRepository.findOne({
+    const model = await this.modelItemRepository.findOne({
       where: { id: modelId },
       relations: ['columns'],
     });
@@ -51,5 +59,13 @@ export class ServicesService {
     }
 
     return this.generateService(model.name);
+  }
+
+  generateBarrel(classNames: string[]) {
+    const barrel = {
+      files: classNames.map((className) => className + '.service'),
+    };
+
+    return this.handlebarsService.compileTemplate(this.barrelTemplate, barrel);
   }
 }

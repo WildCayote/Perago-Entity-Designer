@@ -14,6 +14,11 @@ import { CreateColumnDto, UpdateColumnDto } from './dto/column.dto';
 export class ColumnController {
   constructor(private columnService: ColumnService) {}
 
+  @Get(':modelId/columns')
+  getColumns(@Param('modelId') modelId: string) {
+    return this.columnService.getColumns(modelId);
+  }
+
   @Get(':modelId/columns/:columnId')
   getColumn(
     @Param('modelId') modelId: string,

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -95,6 +96,7 @@ export class ColumnService {
         isForiegn: data.isForiegn,
         isPrimary: data.isPrimary,
         isUnique: data.isUnique,
+        isNullable: data.isNullable,
         type: data.type,
       });
 
@@ -133,7 +135,15 @@ export class ColumnService {
           );
       }
 
-      await this.columnRepository.update(
+      if (data.isForiegn) {
+        // create the relation
+        const createdRelation = this.createRelation(columnId, data.relation);
+      }
+
+      if (!data.isForiegn) {
+      }
+
+      const updateResponse = await this.columnRepository.update(
         { id: columnId },
         {
           name: data.name,
@@ -143,6 +153,7 @@ export class ColumnService {
           type: data.type,
         },
       );
+      console.log(updateResponse);
 
       return 'Update was succesfull!';
     } catch (error) {
@@ -179,6 +190,22 @@ export class ColumnService {
         throw new BadRequestException(
           "The column you are trying to create a relation for doesn't exist!",
         );
+    }
+  }
+
+  async removeRelation(columnId: string) {
+    try {
+      const toBeDeleted = this.relationShipRepository.find({
+        where: { columnId: columnId },
+      });
+
+      const deleteResult = await this.relationShipRepository.delete({
+        columnId: columnId,
+      });
+      console.log(deleteResult);
+      return;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
     }
   }
 
