@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 
 import * as PgBoss from 'pg-boss';
 import * as fs from 'fs';
@@ -11,20 +11,39 @@ import { PgBossGateway } from './pg-boss.gateway';
 export class PgBossService {
   private boss: PgBoss;
   constructor(
+    
     private codeGenService: CodeGenService,
     // private barrelGenService: BarrelGenService,
     private pgBossGateway: PgBossGateway,
+    
   ) {
+    
     this.boss = new PgBoss(
-      'postgres://postgres:believe%26achieve%40suchcringe@localhost:5433/PeragoEntityDB',
+      'postgres://postgres:dawit@localhost:5433/code_gen',
+      // 'postgres://postgres:dawit@localhost:5433/database',
+      // postgresql://username:password@host:port/database_name
     );
 
-    this.boss.start().catch((err) => {
-      console.error('Error starting pg-boss:', err);
-    });
+    // this.boss.start().catch((err) => {
+    //   console.error('\nError starting pg-boss:', err);
+    // });
 
-    this.boss.work('processing_queue', this.compilingJob.bind(this));
-    this.boss.work('cleaning_queue', this.cleaningJob.bind(this));
+    // this.boss.work('\nprocessing_queue', this.compilingJob.bind(this));
+    // this.boss.work('\ncleaning_queue', this.cleaningJob.bind(this));
+  }
+
+  async onModuleInit() {
+    try {
+      await this.boss.start();
+      this.boss.work('processing_queue', this.compilingJob.bind(this));
+      this.boss.work('cleaning_queue', this.cleaningJob.bind(this));
+    } catch (error) {
+      if (error.code === '42701') {
+        console.error('Column already exists, skipping migration');
+      } else {
+        throw error;
+      }
+    }
   }
 
   async addJob(projectId: string) {
@@ -37,7 +56,6 @@ export class PgBossService {
         startAfter: 30,
       },
     );
-
     return jobId;
   }
 
@@ -45,20 +63,17 @@ export class PgBossService {
     try {
       const removeWaitTimeHourse = 48;
       console.log(`started working on job ${job.id}`);
-
       this.codeGenService
         .getProject(job.data.projectId)
         .then(async (result) => {
           // cache the result (as a zip file) , preferrably a dedicated file server but for now on the current server
           await this.cacheZip(job.id, result);
-
           // add a job to remove the zip file after some defined time
           await this.boss.send(
             'cleaning_queue',
             { jobId: job.id },
             { startAfter: removeWaitTimeHourse * 60 * 60 },
           );
-
           // then notify the user to obtain it from the defined enpoint
           this.pgBossGateway.wss.emit(
             job.id,
@@ -95,11 +110,9 @@ export class PgBossService {
         case 'failed':
           throw new InternalServerErrorException(job.output);
       }
-
       // read the file and return the buffer
       const filePath = `src/pg-boss/output/${jobId}.zip`;
       const buffer = fs.readFileSync(filePath);
-
       return buffer;
     } catch (error) {
       throw error;

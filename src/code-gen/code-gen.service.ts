@@ -1,15 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import {
-  ControllersService,
-  DtosService,
-  EntitiesService,
-  ModulesService,
-  ServicesService,
-  BootstrapService,
-} from './services';
+// import {
+//   ControllersService,
+//   DtosService,
+//   EntitiesService,
+//   ModulesService,
+//   ServicesService,
+//   BootstrapService,
+// } from './services';
 import * as JSZip from 'jszip';
 import * as fs from 'fs';
 import { promisify } from 'util';
+import { BootstrapService } from './bootstrap/bootstrap.service';
+import { ControllersService } from './controllers/controllers.service';
+import { DtosService } from './dtos/dtos.service';
+import { EntitiesService } from './entities/entities.service';
+import { ModulesService } from './modules/modules.service';
+import { ServicesService } from './services/services.service';
 
 const writeFileAsync = promisify(fs.writeFile);
 

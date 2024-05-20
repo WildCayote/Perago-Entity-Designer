@@ -1,36 +1,53 @@
 import { Module } from '@nestjs/common';
+
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { typeormConfig } from '../config/typeorm.config';
 
-import { ModelModule } from './model/model.module';
-import { Model } from './entities/model.entity';
-import { Columns } from './entities/column.entity';
-import { RelationShip } from './entities/relationship.entity';
-import { CodeGenModule } from './code-gen/code-gen.module';
-import { Project } from './entities/project.entity';
+import { ModelModule } from './database/model/model.module';
+import { ColumnsModule } from './database/columns/columns.module';
+import { RelationsModule } from './database/relations/relations.module';
+import { ProjectModule } from './database/project/project.module';
+import { EntitiesModule } from './code-gen/entities/entities.module';
+import { DtosModule } from './code-gen/dtos/dtos.module';
+import { ServicesModule } from './code-gen/services/services.module';
+import { ControllersModule } from './code-gen/controllers/controllers.module';
+import { ModulesModule } from './code-gen/modules/modules.module';
+import { HandlebarsService } from './handlebars.service';
+import { FileIoModule } from './file-io/file-io.module';
+import { BootstrapModule } from './code-gen/bootstrap/bootstrap.module';
 import { PgBossModule } from './pg-boss/pg-boss.module';
-import { ProjectModule } from './project/project.module';
-import { ColumnModule } from './column/column.module';
-
-import { ExtractorModule } from './extractor/extractor.module';
+import { CodeGenModule } from './code-gen/code-gen.module';
 
 @Module({
   imports: [
+    // TypeOrmModule.forRoot(typeormConfig),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
       port: 5433,
       username: 'postgres',
-      password: 'believe&achieve@suchcringe',
-      database: 'PeragoEntityDB',
-      entities: [Project, Model, Columns, RelationShip],
+      password: 'dawit',
+      database: 'database',
+      // entities: [Project, Model, Columns, RelationShip],
+      entities: [__dirname + '/../**/*.entity.{ts,js}'],
       synchronize: true,
     }),
-    ModelModule,
-    CodeGenModule,
-    PgBossModule,
     ProjectModule,
-    ColumnModule,
-    ExtractorModule,
+    ModelModule,
+    ColumnsModule,
+    RelationsModule,
+    EntitiesModule,
+    DtosModule,
+    ServicesModule,
+    ControllersModule,
+    ModulesModule,
+    FileIoModule,
+    BootstrapModule,
+    PgBossModule,
+    CodeGenModule
   ],
+  controllers: [],
+  providers: [HandlebarsService],
+  exports: [HandlebarsService],
 })
 export class AppModule {}

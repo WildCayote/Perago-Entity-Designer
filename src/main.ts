@@ -5,12 +5,13 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
+  
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  app.enableCors();
-  app.enableVersioning({
-    type: VersioningType.URI,
-  });
+  // app.setGlobalPrefix('api');
+  // app.enableCors();
+  // app.enableVersioning({
+  //   type: VersioningType.URI,
+  // });
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
@@ -24,6 +25,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000);
+  await app.listen(3333);
 }
 bootstrap();

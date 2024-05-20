@@ -1,8 +1,9 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Columns } from 'src/entities/column.entity';
-import { Model } from 'src/entities/model.entity';
-import { Project } from 'src/entities/project.entity';
+import { ColumnItem as Columns } from 'src/database/columns/entities/column.entity';
+import { ModelItem as Model } from 'src/database/model/entities/model.entity';
+import { ProjectItem as Project } from 'src/database/project/entities/project.entity';
+
 import { PgBossService } from 'src/pg-boss/pg-boss.service';
 import { Repository } from 'typeorm';
 
@@ -26,6 +27,7 @@ export class ExtractorService {
       const project = await this.projectRepository.findOne({
         where: { id: projectId },
       });
+      console.log("project: ",project);
       const pgResponse = await this.pgBossService.addJob(projectId);
 
       console.log(`Job Id recieved : ${pgResponse}`);

@@ -4,9 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ExtractorService } from './extractor.service';
 import { PgBossModule } from 'src/pg-boss/pg-boss.module';
 
-import { Project } from 'src/entities/project.entity';
-import { Columns } from 'src/entities/column.entity';
-import { Model } from 'src/entities/model.entity';
+import { ColumnItem as Columns } from 'src/database/columns/entities/column.entity';
+import { ModelItem as Model } from 'src/database/model/entities/model.entity';
+import { ProjectItem as Project } from 'src/database/project/entities/project.entity';
 import { ExtractorController } from './extractor.controller';
 
 @Module({

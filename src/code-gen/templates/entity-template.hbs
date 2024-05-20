@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 {{#each Relationships}}
   {{#if (eq RelationshipType "many-to-one")}}
   import { ManyToOne } from 'typeorm';
@@ -20,7 +20,7 @@ export class {{PascalCase ClassName}} {
 
   {{#if PrimaryKey}}
   @PrimaryGeneratedColumn({{#if (eq PrimaryKeyType "string")}}"uuid"{{else}}"int"{{/if}})
-  {{camelCase PrimaryKey}}: {{PrimaryKeyType}};
+  {{PrimaryKey}}: {{PrimaryKeyType}};
   {{/if}}
   
 
@@ -31,7 +31,7 @@ export class {{PascalCase ClassName}} {
       unique: true, 
       {{/if}}
     })
-    {{ camelCase Name}}: {{Type}};
+    {{ Name}}: {{Type}};
  {{/each}}
 
  {{#each Relationships}}
@@ -45,6 +45,8 @@ export class {{PascalCase ClassName}} {
     @OneToMany(() => {{RelatedEntity}}, ({{RelatedEntityLower}}) => {{RelatedEntityLower}}.{{ForeignKey}})
     {{/if}}
     
-    {{camelCase Name}}: {{Type}};
+    {{Name}}: {{Type}};
  {{/each}}
+
+
 }

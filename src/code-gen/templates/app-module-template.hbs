@@ -1,22 +1,44 @@
-import { Module } from '@nestjs/common'; import { TypeOrmModule } from
-'@nestjs/typeorm';
-{{#each Entities}}
-  import {
-  {{PascalCase this}}Module } from './{{kebab-case this}}/{{kebab-case
-    this
-  }}.module';
-{{/each}}
-{{#each Entities}}
-  import {
-  {{PascalCase this}}
-  } from './entities/{{kebab-case this}}.entity';
-{{/each}}
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
-@Module({ imports: [ TypeOrmModule.forRoot({ type: 'postgres', host:
-'localhost', port: 5432, username: 'your_username', password: 'your_password',
-database: 'your_database', entities: [{{#each Entities}}{{PascalCase
-    this
-  }}{{#unless @last}}, {{/unless}}{{/each}}], synchronize: true, }),
-{{#each Entities}}{{PascalCase this}}Module{{#unless @last}},
-  {{/unless}}{{/each}}
-], }) export class AppModule {}
+
+{{#if default}}
+  {{#each Entities}}
+    import { {{PascalCase this}}Module } from "./{{kebab-case this}}";
+  {{/each}}
+{{else}}
+  {{#each Entities}}
+    import { {{PascalCase this}}Module } from "{{modulePattern}}";
+  {{/each}}
+{{/if}}
+
+
+
+import { 
+  {{#each Entities}}
+  {{PascalCase this}}, {{#unless @last}} {{/unless}}
+  {{/each}}
+} from "{{entityPattern}}";
+
+@Module({
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'your_username',
+      password: 'your_password',
+      database: 'your_database',
+      entities: [
+        {{#each Entities}}
+        {{PascalCase this}}{{#unless @last}}, {{/unless}}
+        {{/each}}
+      ],
+      synchronize: true,
+    }),
+    {{#each Entities}}
+    {{PascalCase this}}Module{{#unless @last}},{{/unless}}
+    {{/each}}
+  ],
+})
+export class AppModule {}

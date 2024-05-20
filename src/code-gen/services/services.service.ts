@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Model } from 'src/entities/model.entity';
+import { ModelItem } from 'src/database/model/entities/model.entity';
 import { Repository } from 'typeorm';
 import * as fs from 'fs';
 import * as handlebars from 'handlebars';
-import { HandlebarsService } from './handlebars.service';
-import { importPattern } from './import-pattern';
+import { HandlebarsService } from 'src/handlebars.service';
+import { importPattern } from 'src/import-pattern';
 
 @Injectable()
 export class ServicesService {
@@ -14,8 +14,8 @@ export class ServicesService {
   constructor(
     private readonly handlebarsService: HandlebarsService,
 
-    @InjectRepository(Model)
-    private readonly modelItemRepository: Repository<Model>,
+    @InjectRepository(ModelItem)
+    private readonly modelItemRepository: Repository<ModelItem>,
   ) {
     this.serviceTemplate = fs.readFileSync(
       'src/code-gen/templates/service-template.hbs',
@@ -27,7 +27,7 @@ export class ServicesService {
     );
   }
 
-  generateService(className: string, pattern: string = 'default') {
+  generateService(className: string, pattern: string = "default") {
     const service = {
       ClassName: className,
       dtoPattern: importPattern[pattern].service.dtoPattern,
@@ -39,7 +39,7 @@ export class ServicesService {
     );
   }
 
-  generateServices(classNames: string[], pattern: string = 'default') {
+  generateServices(classNames: string[], pattern: string = "default") {
     const generatedServices = {};
 
     classNames.forEach((className) => {
@@ -58,7 +58,7 @@ export class ServicesService {
       throw new NotFoundException(`Model with id ${modelId} not found`);
     }
 
-    return this.generateService(model.name);
+    return this.generateService(model.modelName);
   }
 
   generateBarrel(classNames: string[]) {
