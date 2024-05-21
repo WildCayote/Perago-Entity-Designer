@@ -68,6 +68,9 @@ export class EntitiesService {
             },
             relations: ['referencedColumn'],
           });
+
+          console.log('*********** ', column.name, ' ********', relation);
+
           const relatedEntity = this.allModels.find((model) =>
             model.columns.find((col) => col.id === relation.referencedColumnId),
           );
@@ -79,13 +82,13 @@ export class EntitiesService {
             RelatedEntityLower:
               relatedEntity.name.charAt(0).toLowerCase() +
               relatedEntity.name.slice(1),
-            Name: relation.name,
+            Name: column.name,
             RelationshipType: relation.type,
             Type: column.type,
           };
         }),
     );
-    console.log('relationships:', relationships);
+    console.log('relationships: ', relationships);
 
     const table = {
       ClassName: model.name,

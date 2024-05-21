@@ -25,10 +25,10 @@ export class CodeGenService {
   ) {}
 
   async getProject(id: string, pattern: string = 'default') {
-    console.log('pattern: ', pattern);
+    // console.log('pattern: ', pattern);
     const [entites, projectData] =
       await this.entitiesService.generateAllEntities(id);
-    
+
     const entityNamesList = Object.keys(entites).slice(1);
 
     const dtos = await this.dtosService.generateAllDTOsByProject(
@@ -77,7 +77,7 @@ export class CodeGenService {
       projectData.projectName.toLowerCase(),
     );
 
-    console.log('project: ', project);
+    // console.log('project: ', project);
 
     // Create a new zip file
     const zip = new JSZip();
