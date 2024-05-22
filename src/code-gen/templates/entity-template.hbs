@@ -34,17 +34,22 @@ export class {{PascalCase ClassName}} {
     {{ camelCase Name}}: {{Type}};
  {{/each}}
 
+ 
+
  {{#each Relationships}}
     {{#if (eq RelationshipType "many-to-one")}}
-    @ManyToOne(() => {{RelatedEntity}}, ({{RelatedEntityLower}}) => {{RelatedEntityLower}}.{{ForeignKey}})
+      @ManyToOne(() => {{RelatedEntity}}, ({{RelatedEntityLower}}) => {{RelatedEntityLower}}.{{ForeignKey}})
+      @JoinColumn({ name: '{{camelCase Name}}' })
+      {{camelCase Name}}: {{RelatedEntity}};
     {{/if}}
     {{#if (eq RelationshipType "one-to-one")}}
-    @OneToOne(() => {{RelatedEntity}}, ({{RelatedEntityLower}}) => {{RelatedEntityLower}}.{{ForeignKey}})
+      @OneToOne(() => {{RelatedEntity}}, ({{RelatedEntityLower}}) => {{RelatedEntityLower}}.{{ForeignKey}})
+      @JoinColumn({ name: '{{camelCase Name}}' })
+      {{camelCase Name}}: {{RelatedEntity}};
     {{/if}}
     {{#if (eq RelationshipType "one-to-many")}}
-    @OneToMany(() => {{RelatedEntity}}, ({{RelatedEntityLower}}) => {{RelatedEntityLower}}.{{ForeignKey}})
+      @OneToMany(() => {{RelatedEntity}}, ({{RelatedEntityLower}}) => {{RelatedEntityLower}}.{{ForeignKey}})
+      {{camelCase Name}}: {{RelatedEntity}}[];
     {{/if}}
-    
-    {{camelCase Name}}: {{Type}};
- {{/each}}
+  {{/each}}
 }
