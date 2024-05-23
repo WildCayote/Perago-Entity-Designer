@@ -176,6 +176,45 @@ export class ColumnService {
     }
   }
 
+  // async createRelation(columnId: string, data: CreateRelationDto) {
+  //   try {
+  //     const newRelation = this.relationShipRepository.create({
+  //       columnId: columnId,
+  //       ...data,
+  //     });
+
+  //     await this.relationShipRepository.save(newRelation);
+
+  //     let reverseType;
+  //     switch (data.type) {
+  //       case 'one-to-one':
+  //         reverseType = 'one-to-one';
+  //       case 'many-to-one':
+  //         reverseType = 'one-to-many';
+  //       case 'one-to-many':
+  //         reverseType = 'many-to-one';
+  //     }
+
+  //     const reverseRelation = {
+  //       ...data,
+  //       type: reverseType,
+  //       columnId: data.referencedColumnId,
+  //       name: data.name,
+  //       referencedId: columnId,
+  //     };
+
+  //     const newReverseRelation =
+  //       this.relationShipRepository.create(reverseRelation);
+
+  //     await this.relationShipRepository.save(newReverseRelation);
+  //     return newRelation;
+  //   } catch (error) {
+  //     if (error.code === '23503')
+  //       throw new BadRequestException(
+  //         "The column you are trying to create a relation for doesn't exist!",
+  //       );
+  //   }
+  // }
   async createRelation(columnId: string, data: CreateRelationDto) {
     try {
       const newRelation = this.relationShipRepository.create({
@@ -215,6 +254,7 @@ export class ColumnService {
         );
     }
   }
+
 
   async removeRelation(columnId: string) {
     try {

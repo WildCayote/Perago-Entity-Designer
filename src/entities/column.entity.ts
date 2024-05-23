@@ -45,13 +45,14 @@ export class Columns {
   @OneToOne((type) => RelationShip, (relationship) => relationship.column, {
     nullable: true,
     eager: true,
+    onDelete : 'CASCADE'
   })
   relation: RelationShip;
 
   @OneToMany(
     (type) => RelationShip,
     (relationship) => relationship.referencedColumn,
-    { eager: true },
+    { eager: true , onDelete :'CASCADE'},
   )
   references: RelationShip[];
 }

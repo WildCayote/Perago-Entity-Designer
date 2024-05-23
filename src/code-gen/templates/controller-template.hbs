@@ -1,33 +1,23 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
-import { Create{{PascalCase ClassName}}Dto, Update{{PascalCase ClassName}}Dto } from '../../dtos/{{kebab-case ClassName}}.dto';
-import { {{PascalCase ClassName}}Service } from '../services/{{kebab-case ClassName}}.service';
+import { Controller } from '@nestjs/common';
+import { ExtraCrudController } from 'src/shared/controller';
+import { ExtraCrudOptions } from 'src/shared/types/crud-option.type
+import { Create{{PascalCase ClassName}}Dto, Update{{PascalCase ClassName}}Dto } from "{{dtoPattern}}";
+import { {{PascalCase ClassName}}Service } from "{{servicePattern}}";
+
+
+const options: ExtraCrudOptions = {
+  entityIdName: '',
+  createDto: Create{{PascalCase ClassName}}Dto,
+};
 
 @Controller('{{kebab-case ClassName}}')
-export class {{PascalCase ClassName}}Controller {
-  constructor(private readonly {{camelCase ClassName}}Service: {{PascalCase ClassName}}Service) {}
-
-  @Get()
-  async findAll() {
-    return await this.{{camelCase ClassName}}Service.findAll();
+export class {{PascalCase ClassName}}Controller extends ExtraCrudController<{{PascalCase ClassName}}>(
+  options,
+) {
+  constructor(
+    private readonly {{camelCase ClassName}}Service: {{PascalCase ClassName}}Service,
+  ) {
+    super({{camelCase ClassName}}Service);
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.{{camelCase ClassName}}Service.findOne(id);
-  }
-
-  @Post()
-  async create(@Body() create{{PascalCase ClassName}}Dto: Create{{PascalCase ClassName}}Dto) {
-    return await this.{{camelCase ClassName}}Service.create(create{{PascalCase ClassName}}Dto);
-  }
-
-  @Put(':id')
-  async update(@Param('id') id: string, @Body() update{{PascalCase ClassName}}Dto: Update{{PascalCase ClassName}}Dto) {
-    return await this.{{camelCase ClassName}}Service.update(id, update{{PascalCase ClassName}}Dto);
-  }
-
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return await this.{{camelCase ClassName}}Service.remove(id);
-  }
 }

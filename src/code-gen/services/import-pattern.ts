@@ -5,7 +5,7 @@ export const importPattern = {
       entityPattern: './entities',
     },
     controller: {
-      dtoPattern: '../../dtos',
+      dtoPattern: 'src/dtos',
       servicePattern: '../services',
     },
     module: {
@@ -14,8 +14,8 @@ export const importPattern = {
       servicePattern: './services',
     },
     service: {
-      dtoPattern: '../../dtos',
-      entityPattern: '../../entities',
+      dtoPattern: 'src/dtos',
+      entityPattern: 'src/entities',
     },
   },
   layered: {

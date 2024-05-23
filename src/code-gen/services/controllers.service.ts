@@ -6,6 +6,7 @@ import * as fs from 'fs';
 
 import { HandlebarsService } from './handlebars.service';
 import { importPattern } from './import-pattern';
+import { toKebabCase } from 'js-convert-case';
 
 @Injectable()
 export class ControllersService {
@@ -75,7 +76,7 @@ export class ControllersService {
 
   generateBarrel(classNames: string[]) {
     const barrel = {
-      files: classNames.map((className) => className + '.controller'),
+      files: classNames.map((className) => toKebabCase(className) + '.controller'),
     };
 
     return this.handleBarsService.compileTemplate(this.barrelTemplate, barrel);

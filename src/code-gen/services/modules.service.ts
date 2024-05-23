@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import * as handlebars from 'handlebars';
 import { HandlebarsService } from './handlebars.service';
 import { importPattern } from './import-pattern';
+import { toKebabCase } from 'js-convert-case';
 
 @Injectable()
 export class ModulesService {
@@ -29,7 +30,7 @@ export class ModulesService {
 
   generateBarrel(modelNames: string[]) {
     const data = {
-      files: modelNames.map((modelName) => modelName + '.module'),
+      files: modelNames.map((modelName) => toKebabCase(modelName) + '.module'),
     };
     const barrel = this.handlebarsService.compileTemplate(
       this.barrelTemplate,

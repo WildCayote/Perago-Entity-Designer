@@ -8,6 +8,7 @@ import { RelationShip } from 'src/entities/relationship.entity';
 import { Columns } from 'src/entities/column.entity';
 import { HandlebarsService } from './handlebars.service';
 import { ModelService } from 'src/model/model.service';
+import { toKebabCase } from 'js-convert-case';
 
 @Injectable()
 export class EntitiesService {
@@ -57,10 +58,11 @@ export class EntitiesService {
       }));
 
     const primaryKey = model.columns.find((column) => column.isPrimary);
+    console.log("Primary key: ", primaryKey) 
 
     const relationships = await Promise.all(
       model.columns
-        .filter((column) => column.isForiegn)
+        .filter((column) => column.isForiegn || column.references.length > 0)
         .map(async (column) => {
           const relation = await this.relationItemRepository.findOne({
             where: {
@@ -93,7 +95,7 @@ export class EntitiesService {
     
 
     const table = {
-      ClassNmae: this.removeSpaces(model.name),
+      ClassName: this.removeSpaces(model.name),
       // ClassName: model.name,
       // ClassNameLower: model.name.charAt(0).toLowerCase() + model.name.slice(1),
       ClassNameLower: this.toCamelCase(model.name),
@@ -134,7 +136,7 @@ export class EntitiesService {
 
   generateBarrel(classNames: string[]) {
     const barrel = {
-      files: classNames.map((className) => className + '.entity'),
+      files: classNames.map((className) => toKebabCase(className) + '.entity'),
     };
     return this.handlebarsService.compileTemplate(this.barrelTemplate, barrel);
   }

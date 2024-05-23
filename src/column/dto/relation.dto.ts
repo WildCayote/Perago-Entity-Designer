@@ -10,7 +10,7 @@ export class CreateRelationDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  @IsIn(['one-to-one', 'many-to-one', 'many-to-many'])
+  @IsIn(['one-to-one', 'many-to-one', 'one-to-many'])
   type: string;
 
   @ApiProperty()

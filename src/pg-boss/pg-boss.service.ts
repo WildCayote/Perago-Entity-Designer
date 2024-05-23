@@ -16,7 +16,7 @@ export class PgBossService {
     private pgBossGateway: PgBossGateway,
   ) {
     this.boss = new PgBoss(
-      'postgres://postgres:believe%26achieve%40suchcringe@localhost:5433/PeragoEntityDB',
+      'postgres://postgres:lens@localhost:5432/PeragoEntityDB',
     );
 
     this.boss.start().catch((err) => {
@@ -34,7 +34,7 @@ export class PgBossService {
         projectId: projectId,
       },
       {
-        startAfter: 30,
+        startAfter: 10,
       },
     );
 
