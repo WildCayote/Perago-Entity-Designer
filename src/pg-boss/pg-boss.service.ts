@@ -16,15 +16,8 @@ export class PgBossService {
     private pgBossGateway: PgBossGateway,
   ) {
     this.boss = new PgBoss(
-      'postgres://postgres:lens@localhost:5432/PeragoEntityDB',
+      'postgres://postgres:believe%26achieve%40suchcringe@localhost:5433/PeragoEntityDB',
     );
-
-    // this.boss.start().catch((err) => {
-    //   console.error('Error starting pg-boss:', err);
-    // });
-
-    // this.boss.work('processing_queue', this.compilingJob.bind(this));
-    // this.boss.work('cleaning_queue', this.cleaningJob.bind(this));
   }
 
   onModuleInit() {
@@ -37,8 +30,8 @@ export class PgBossService {
       this.boss.work('cleaning_queue', this.cleaningJob.bind(this));
     } catch (error) {
       this.handlePgBossError(error);
-    }}
-
+    }
+  }
 
   async addJob(projectId: string) {
     let jobId = await this.boss.send(
@@ -130,13 +123,13 @@ export class PgBossService {
   }
 
   private handlePgBossError(error: any) {
-    if (error.code === '42701' ) {
-      console.error('The column already exists in table. Skipping migration step.');
-      
+    if (error.code === '42701') {
+      console.error(
+        'The column already exists in table. Skipping migration step.',
+      );
     } else {
       console.error('Error starting pg-boss:', error);
-      throw error; // Re-throw the error 
+      throw error; // Re-throw the error
     }
   }
-
 }

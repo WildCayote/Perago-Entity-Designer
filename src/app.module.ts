@@ -16,9 +16,9 @@ import { ExtractorModule } from './extractor/extractor.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
-      port: 5432,
+      port: 5433,
       username: 'postgres',
-      password: 'lens',
+      password: 'believe&achieve@suchcringe',
       database: 'PeragoEntityDB',
       entities: [Project, Model, Columns, RelationShip],
       synchronize: true,

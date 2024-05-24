@@ -3,9 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Model } from 'src/entities/model.entity';
 import { Repository } from 'typeorm';
 import * as fs from 'fs';
-import * as handlebars from 'handlebars';
 import { RelationShip } from 'src/entities/relationship.entity';
-import { Columns } from 'src/entities/column.entity';
 import { HandlebarsService } from './handlebars.service';
 import { ModelService } from 'src/model/model.service';
 import { toKebabCase } from 'js-convert-case';
@@ -48,6 +46,7 @@ export class EntitiesService {
       }
     }
 
+    // getting all the normal columns , ones that aren't primary nor foriegn key columns
     const properties = model.columns
       .filter((column) => !column.isPrimary && !column.isForiegn)
       .map((column) => ({
@@ -57,6 +56,7 @@ export class EntitiesService {
         Unique: column.isUnique,
       }));
 
+    // find the primary key  
     const primaryKey = model.columns.find((column) => column.isPrimary);
     console.log("Primary key: ", primaryKey) 
 
