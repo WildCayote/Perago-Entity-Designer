@@ -181,6 +181,7 @@ export class ColumnService {
       const newRelation = this.relationShipRepository.create({
         columnId: columnId,
         ...data,
+        name: '',
       });
 
       await this.relationShipRepository.save(newRelation);

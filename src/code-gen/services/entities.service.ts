@@ -56,9 +56,9 @@ export class EntitiesService {
         Unique: column.isUnique,
       }));
 
-    // find the primary key  
+    // find the primary key
     const primaryKey = model.columns.find((column) => column.isPrimary);
-    console.log("Primary key: ", primaryKey) 
+    console.log('Primary key: ', primaryKey);
 
     const relationships = await Promise.all(
       model.columns
@@ -80,19 +80,22 @@ export class EntitiesService {
             ForeignKey: this.removeSpaces(relation.referencedColumn.name),
             RelatedEntity: this.removeSpaces(
               relatedEntity.name.charAt(0).toUpperCase() +
-              relatedEntity.name.slice(1)),
-            RelatedEntityLower:this.removeSpaces(
+                relatedEntity.name.slice(1),
+            ),
+            RelatedEntityLower: this.removeSpaces(
               relatedEntity.name.charAt(0).toLowerCase() +
-              relatedEntity.name.slice(1)),
+                relatedEntity.name.slice(1),
+            ),
             Name: this.removeSpaces(column.name),
+            ReversedName: this.removeSpaces(
+              relation.name == null ? '' : relation.name,
+            ),
             RelationshipType: relation.type,
             Type: column.type,
           };
         }),
     );
     console.log('relationships: ', relationships);
-
-    
 
     const table = {
       ClassName: this.removeSpaces(model.name),
@@ -143,7 +146,7 @@ export class EntitiesService {
 
   removeSpaces(str: string): string {
     return str.replace(/\s+/g, '');
-}
+  }
 
   toCamelCase(str: string): string {
     if (/^[a-z][a-zA-Z0-9]*$/.test(str)) {

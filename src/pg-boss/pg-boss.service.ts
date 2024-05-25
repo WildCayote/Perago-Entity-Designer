@@ -15,9 +15,7 @@ export class PgBossService {
     // private barrelGenService: BarrelGenService,
     private pgBossGateway: PgBossGateway,
   ) {
-    this.boss = new PgBoss(
-      'postgres://postgres:believe%26achieve%40suchcringe@localhost:5433/PeragoEntityDB',
-    );
+    this.boss = new PgBoss('postgres://postgres:dawit@localhost:5433/code_gen');
   }
 
   onModuleInit() {

@@ -1,55 +1,84 @@
 import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
 {{#each Relationships}}
-  {{#if (eq RelationshipType "many-to-one")}}
-  import { ManyToOne } from 'typeorm';
-    import { {{RelatedEntity}} } from './{{kebab-case RelatedEntity}}.entity'; 
+  {{#if (eq RelationshipType 'many-to-one')}}
+    import { ManyToOne } from 'typeorm'; import {
+    {{RelatedEntity}}
+    } from './{{kebab-case RelatedEntity}}.entity';
   {{/if}}
-  {{#if (eq RelationshipType "one-to-one")}}
-  import { OneToOne } from 'typeorm';
-    import { {{RelatedEntity}} } from './{{kebab-case RelatedEntity}}.entity'; 
+  {{#if (eq RelationshipType 'one-to-one')}}
+    import { OneToOne } from 'typeorm'; import {
+    {{RelatedEntity}}
+    } from './{{kebab-case RelatedEntity}}.entity';
   {{/if}}
-  {{#if (eq RelationshipType "one-to-many")}}
-  import { OneToMany } from 'typeorm';
-    import { {{RelatedEntity}} } from './{{kebab-case RelatedEntity}}.entity'; 
+  {{#if (eq RelationshipType 'one-to-many')}}
+    import { OneToMany } from 'typeorm'; import {
+    {{RelatedEntity}}
+    } from './{{kebab-case RelatedEntity}}.entity';
   {{/if}}
 {{/each}}
 
+@Entity() export class
+{{PascalCase ClassName}}
+{
 
-@Entity()
-export class {{PascalCase ClassName}} {
+{{#if PrimaryKey}}
+  @PrimaryGeneratedColumn({{#if
+    (eq PrimaryKeyType 'string')
+  }}"uuid"{{else}}"int"{{/if}})
+  {{camelCase PrimaryKey}}:
+  {{PrimaryKeyType}};
+{{/if}}
 
-  {{#if PrimaryKey}}
-  @PrimaryGeneratedColumn({{#if (eq PrimaryKeyType "string")}}"uuid"{{else}}"int"{{/if}})
-  {{camelCase PrimaryKey}}: {{PrimaryKeyType}};
+{{#each Properties}}
+  @Column({ nullable:
+  {{Nullable}},
+  {{#if Unique}}
+    unique: true,
   {{/if}}
-  
+  })
+  {{camelCase Name}}:
+  {{Type}};
+{{/each}}
 
- {{#each Properties}}
-    @Column({
-      nullable: {{Nullable}},
-      {{#if Unique}}
-      unique: true, 
-      {{/if}}
-    })
-    {{ camelCase Name}}: {{Type}};
- {{/each}}
+{{#each Relationships}}
+  {{#if (eq RelationshipType 'many-to-one')}}
+    @ManyToOne(() =>
+    {{RelatedEntity}}, ({{RelatedEntityLower}}) =>
+    {{RelatedEntityLower}}.{{ForeignKey}})
+    {{#if (eq ReversedName '')}}
+      {{camelCase Name}}:
+      {{RelatedEntity}};
+    {{else}}
+      {{camelCase ReversedName}}:
+      {{RelatedEntity}};
+    {{/if}}
 
- 
+  {{/if}}
+  {{#if (eq RelationshipType 'one-to-one')}}
+    @OneToOne(() =>
+    {{RelatedEntity}}, ({{RelatedEntityLower}}) =>
+    {{RelatedEntityLower}}.{{ForeignKey}})
 
- {{#each Relationships}}
-    {{#if (eq RelationshipType "many-to-one")}}
-      @ManyToOne(() => {{RelatedEntity}}, ({{RelatedEntityLower}}) => {{RelatedEntityLower}}.{{ForeignKey}})
-      @JoinColumn({ name: '{{camelCase Name}}' })
-      {{camelCase Name}}: {{RelatedEntity}};
+    {{#if (eq ReversedName '')}}
+      {{camelCase Name}}:
+      {{RelatedEntity}};
+    {{else}}
+      {{camelCase ReversedName}}:
+      {{RelatedEntity}};
     {{/if}}
-    {{#if (eq RelationshipType "one-to-one")}}
-      @OneToOne(() => {{RelatedEntity}}, ({{RelatedEntityLower}}) => {{RelatedEntityLower}}.{{ForeignKey}})
-      @JoinColumn({ name: '{{camelCase Name}}' })
-      {{camelCase Name}}: {{RelatedEntity}};
+  {{/if}}
+  {{#if (eq RelationshipType 'one-to-many')}}
+    @OneToMany(() =>
+    {{RelatedEntity}}, ({{RelatedEntityLower}}) =>
+    {{RelatedEntityLower}}.{{ForeignKey}})
+    {{#if (eq ReversedName '')}}
+      {{camelCase Name}}:
+      {{RelatedEntity}}[];
+    {{else}}
+      {{camelCase ReversedName}}:
+      {{RelatedEntity}}[];
     {{/if}}
-    {{#if (eq RelationshipType "one-to-many")}}
-      @OneToMany(() => {{RelatedEntity}}, ({{RelatedEntityLower}}) => {{RelatedEntityLower}}.{{ForeignKey}})
-      {{camelCase Name}}: {{RelatedEntity}}[];
-    {{/if}}
-  {{/each}}
+
+  {{/if}}
+{{/each}}
 }
