@@ -46,9 +46,11 @@ import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
     {{RelatedEntity}}, ({{RelatedEntityLower}}) =>
     {{RelatedEntityLower}}.{{ForeignKey}})
     {{#if (eq ReversedName '')}}
+      @JoinColumn()
       {{camelCase Name}}:
       {{RelatedEntity}};
     {{else}}
+      @JoinColumn()
       {{camelCase ReversedName}}:
       {{RelatedEntity}};
     {{/if}}
@@ -60,9 +62,11 @@ import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
     {{RelatedEntityLower}}.{{ForeignKey}})
 
     {{#if (eq ReversedName '')}}
+      @JoinColumn()
       {{camelCase Name}}:
       {{RelatedEntity}};
     {{else}}
+      @JoinColumn()
       {{camelCase ReversedName}}:
       {{RelatedEntity}};
     {{/if}}
@@ -72,9 +76,11 @@ import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
     {{RelatedEntity}}, ({{RelatedEntityLower}}) =>
     {{RelatedEntityLower}}.{{ForeignKey}})
     {{#if (eq ReversedName '')}}
+      @JoinColumn()
       {{camelCase Name}}:
       {{RelatedEntity}}[];
     {{else}}
+      @JoinColumn()
       {{camelCase ReversedName}}:
       {{RelatedEntity}}[];
     {{/if}}

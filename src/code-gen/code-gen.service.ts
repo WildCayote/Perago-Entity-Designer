@@ -10,6 +10,7 @@ import {
 import * as JSZip from 'jszip';
 import * as fs from 'fs';
 import { promisify } from 'util';
+import jsConvert from 'js-convert-case';
 
 const writeFileAsync = promisify(fs.writeFile);
 
@@ -155,10 +156,11 @@ export class CodeGenService {
   }
 
   toKebabCase(text: string): string {
-    let kebabCaseText = text.replace(/\s+/g, '-');
+    // let kebabCaseText = text.replace(/\s+/g, '-');
+    return jsConvert.toKebabCase(text);
 
-    kebabCaseText = kebabCaseText.toLowerCase();
-    return kebabCaseText;
+    // kebabCaseText = kebabCaseText.toLowerCase();
+    // return kebabCaseText;
   }
 
   removeSpaces(str: string): string {

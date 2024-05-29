@@ -98,7 +98,7 @@ export class EntitiesService {
     console.log('relationships: ', relationships);
 
     const table = {
-      ClassName: this.removeSpaces(model.name),
+      ClassName: model.name,
       // ClassName: model.name,
       // ClassNameLower: model.name.charAt(0).toLowerCase() + model.name.slice(1),
       ClassNameLower: this.toCamelCase(model.name),

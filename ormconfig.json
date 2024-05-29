@@ -4,7 +4,7 @@
   "port": 5433,
   "username": "postgres",
   "password": "dawit",
-  "database": "code_gen",
+  "database": "database_design",
   "synchronize": false,
   "entities": [
     "dist/**/*.entity{.ts,.js}"

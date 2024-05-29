@@ -190,10 +190,13 @@ export class ColumnService {
       switch (data.type) {
         case 'one-to-one':
           reverseType = 'one-to-one';
+          break;
         case 'many-to-one':
           reverseType = 'one-to-many';
+          break;
         case 'one-to-many':
           reverseType = 'many-to-one';
+          break;
       }
 
       const reverseRelation = {

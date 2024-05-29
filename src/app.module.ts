@@ -19,7 +19,7 @@ import { ExtractorModule } from './extractor/extractor.module';
       port: 5433,
       username: 'postgres',
       password: 'dawit',
-      database: 'code_gen',
+      database: 'database_design',
       entities: [Project, Model, Columns, RelationShip],
       synchronize: true,
     }),
