@@ -75,7 +75,8 @@ export class CodeGenService {
       modules: modules,
     };
     const project_name = this.toKebabCase(
-      projectData.projectName.toLowerCase(),
+      // projectData.projectName.toLowerCase(),
+      projectData.projectName,
     );
 
     // console.log('project: ', project);

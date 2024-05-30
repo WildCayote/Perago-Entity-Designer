@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import { RelationShip } from 'src/entities/relationship.entity';
 import { HandlebarsService } from './handlebars.service';
 import { ModelService } from 'src/model/model.service';
-import { toKebabCase } from 'js-convert-case';
+import { toKebabCase, toCamelCase } from 'js-convert-case';
 
 @Injectable()
 export class EntitiesService {
@@ -77,19 +77,18 @@ export class EntitiesService {
             model.columns.find((col) => col.id === relation.referencedColumnId),
           );
           return {
-            ForeignKey: this.removeSpaces(relation.referencedColumn.name),
-            RelatedEntity: this.removeSpaces(
+            ForeignKey: relation.referencedColumn.name,
+            RelatedEntity:
               relatedEntity.name.charAt(0).toUpperCase() +
-                relatedEntity.name.slice(1),
-            ),
-            RelatedEntityLower: this.removeSpaces(
+              relatedEntity.name.slice(1),
+
+            RelatedEntityLower:
               relatedEntity.name.charAt(0).toLowerCase() +
-                relatedEntity.name.slice(1),
-            ),
-            Name: this.removeSpaces(column.name),
-            ReversedName: this.removeSpaces(
-              relation.name == null ? '' : relation.name,
-            ),
+              relatedEntity.name.slice(1),
+
+            Name: column.name,
+            ReversedName: relation.name == null ? '' : relation.name,
+
             RelationshipType: relation.type,
             Type: column.type,
           };
@@ -101,7 +100,7 @@ export class EntitiesService {
       ClassName: model.name,
       // ClassName: model.name,
       // ClassNameLower: model.name.charAt(0).toLowerCase() + model.name.slice(1),
-      ClassNameLower: this.toCamelCase(model.name),
+      ClassNameLower: toCamelCase(model.name),
       PrimaryKey: primaryKey.name,
       PrimaryKeyType: primaryKey.type,
       Properties: properties,
@@ -149,20 +148,21 @@ export class EntitiesService {
   }
 
   toCamelCase(str: string): string {
-    if (/^[a-z][a-zA-Z0-9]*$/.test(str)) {
-      return str;
-    }
-    // Split the string into words
-    const words = str.split(/\s+/);
-    // Convert the first word to lowercase and capitalize the first letter of subsequent words
-    const camelCaseStr = words
-      .map((word, index) =>
-        index === 0
-          ? word.toLowerCase()
-          : word.charAt(0).toUpperCase() + word.slice(1),
-      )
-      .join('');
+    return toCamelCase(str);
+    // if (/^[a-z][a-zA-Z0-9]*$/.test(str)) {
+    //   return str;
+    // }
+    // // Split the string into words
+    // const words = str.split(/\s+/);
+    // // Convert the first word to lowercase and capitalize the first letter of subsequent words
+    // const camelCaseStr = words
+    //   .map((word, index) =>
+    //     index === 0
+    //       ? word.toLowerCase()
+    //       : word.charAt(0).toUpperCase() + word.slice(1),
+    //   )
+    //   .join('');
 
-    return camelCaseStr;
+    // return camelCaseStr;
   }
 }

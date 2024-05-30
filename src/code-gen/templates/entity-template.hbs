@@ -2,17 +2,17 @@ import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
 {{#each Relationships}}
   {{#if (eq RelationshipType 'many-to-one')}}
     import { ManyToOne } from 'typeorm'; import {
-    {{RelatedEntity}}
+    {{PascalCase RelatedEntity}}
     } from './{{kebab-case RelatedEntity}}.entity';
   {{/if}}
   {{#if (eq RelationshipType 'one-to-one')}}
     import { OneToOne } from 'typeorm'; import {
-    {{RelatedEntity}}
+    {{PascalCase RelatedEntity}}
     } from './{{kebab-case RelatedEntity}}.entity';
   {{/if}}
   {{#if (eq RelationshipType 'one-to-many')}}
     import { OneToMany } from 'typeorm'; import {
-    {{RelatedEntity}}
+    {{PascalCase RelatedEntity}}
     } from './{{kebab-case RelatedEntity}}.entity';
   {{/if}}
 {{/each}}
@@ -43,46 +43,46 @@ import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
 {{#each Relationships}}
   {{#if (eq RelationshipType 'many-to-one')}}
     @ManyToOne(() =>
-    {{RelatedEntity}}, ({{RelatedEntityLower}}) =>
-    {{RelatedEntityLower}}.{{ForeignKey}})
+    {{PascalCase RelatedEntity}}, ({{camelCase RelatedEntityLower}}) =>
+    {{camelCase RelatedEntityLower}}.{{camelCase ForeignKey}})
     {{#if (eq ReversedName '')}}
       @JoinColumn()
       {{camelCase Name}}:
-      {{RelatedEntity}};
+      {{PascalCase RelatedEntity}};
     {{else}}
       @JoinColumn()
       {{camelCase ReversedName}}:
-      {{RelatedEntity}};
+      {{PascalCase RelatedEntity}};
     {{/if}}
 
   {{/if}}
   {{#if (eq RelationshipType 'one-to-one')}}
     @OneToOne(() =>
-    {{RelatedEntity}}, ({{RelatedEntityLower}}) =>
-    {{RelatedEntityLower}}.{{ForeignKey}})
+    {{PascalCase RelatedEntity}}, ({{camelCase RelatedEntityLower}}) =>
+    {{camelCase RelatedEntityLower}}.{{camelCase ForeignKey}})
 
     {{#if (eq ReversedName '')}}
       @JoinColumn()
       {{camelCase Name}}:
-      {{RelatedEntity}};
+      {{PascalCase RelatedEntity}};
     {{else}}
       @JoinColumn()
       {{camelCase ReversedName}}:
-      {{RelatedEntity}};
+      {{PascalCase RelatedEntity}};
     {{/if}}
   {{/if}}
   {{#if (eq RelationshipType 'one-to-many')}}
     @OneToMany(() =>
-    {{RelatedEntity}}, ({{RelatedEntityLower}}) =>
-    {{RelatedEntityLower}}.{{ForeignKey}})
+    {{PascalCase RelatedEntity}}, ({{camelCase RelatedEntityLower}}) =>
+    {{camelCase RelatedEntityLower}}.{{camelCase ForeignKey}})
     {{#if (eq ReversedName '')}}
       @JoinColumn()
       {{camelCase Name}}:
-      {{RelatedEntity}}[];
+      {{PascalCase RelatedEntity}}[];
     {{else}}
       @JoinColumn()
       {{camelCase ReversedName}}:
-      {{RelatedEntity}}[];
+      {{PascalCase RelatedEntity}}[];
     {{/if}}
 
   {{/if}}
