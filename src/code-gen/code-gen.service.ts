@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   ControllersService,
   DtosService,
@@ -27,13 +27,18 @@ export class CodeGenService {
 
   async getProject(id: string, pattern: string = 'default') {
     // console.log('pattern: ', pattern);
-    const [entites, projectData] =
+    const [entities, projectData] =
       await this.entitiesService.generateAllEntities(id);
 
-    const entityNamesList = Object.keys(entites).slice(1);
+    const entityNamesList = Object.keys(entities).slice(1);
+    if (entityNamesList.length === 0) {
+      throw new NotFoundException(
+        'This specific project does not have any entities',
+      );
+    }
 
     const dtos = await this.dtosService.generateAllDTOsByProject(
-      entites['projectModels'],
+      entities['projectModels'],
     );
     const controllers = this.controllersService.generateControllers(
       entityNamesList,
@@ -68,7 +73,7 @@ export class CodeGenService {
 
     const project = {
       ...projectData,
-      entities: entites,
+      entities: entities,
       dtos: dtos,
       controllers: controllers,
       services: services,
@@ -86,7 +91,7 @@ export class CodeGenService {
 
     // Add files to the zip
     // for entities
-    for (const [key, value] of Object.entries(entites)) {
+    for (const [key, value] of Object.entries(entities)) {
       if (key === 'projectModels') {
         continue;
       }

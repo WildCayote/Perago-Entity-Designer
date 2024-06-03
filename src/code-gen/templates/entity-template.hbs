@@ -46,11 +46,11 @@ import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
     {{PascalCase RelatedEntity}}, ({{camelCase RelatedEntityLower}}) =>
     {{camelCase RelatedEntityLower}}.{{camelCase ForeignKey}})
     {{#if (eq ReversedName '')}}
-      @JoinColumn()
+      @JoinColumn({name: '{{camelCase RelatedEntityLower}}Id'})
       {{camelCase Name}}:
       {{PascalCase RelatedEntity}};
     {{else}}
-      @JoinColumn()
+      @JoinColumn({name: '{{camelCase RelatedEntityLower}}Id'})
       {{camelCase ReversedName}}:
       {{PascalCase RelatedEntity}};
     {{/if}}
@@ -66,7 +66,7 @@ import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
       {{camelCase Name}}:
       {{PascalCase RelatedEntity}};
     {{else}}
-      @JoinColumn()
+
       {{camelCase ReversedName}}:
       {{PascalCase RelatedEntity}};
     {{/if}}
@@ -76,11 +76,11 @@ import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
     {{PascalCase RelatedEntity}}, ({{camelCase RelatedEntityLower}}) =>
     {{camelCase RelatedEntityLower}}.{{camelCase ForeignKey}})
     {{#if (eq ReversedName '')}}
-      @JoinColumn()
+
       {{camelCase Name}}:
       {{PascalCase RelatedEntity}}[];
     {{else}}
-      @JoinColumn()
+
       {{camelCase ReversedName}}:
       {{PascalCase RelatedEntity}}[];
     {{/if}}

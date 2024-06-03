@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Columns } from 'src/entities/column.entity';
 import { Model } from 'src/entities/model.entity';
@@ -26,11 +30,16 @@ export class ExtractorService {
       const project = await this.projectRepository.findOne({
         where: { id: projectId },
       });
-      const pgResponse = await this.pgBossService.addJob(projectId);
 
-      console.log(`Job Id recieved : ${pgResponse}`);
+      if (!project) {
+        throw new NotFoundException(`Project with id ${projectId} not found`);
+      } else {
+        const pgResponse = await this.pgBossService.addJob(projectId);
 
-      return { jobId: pgResponse };
+        console.log(`Job Id recieved : ${pgResponse}`);
+
+        return { jobId: pgResponse };
+      }
     } catch (error) {
       console.log(error);
     }
