@@ -42,6 +42,17 @@ import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
 
 {{#each Relationships}}
   {{#if (eq RelationshipType 'many-to-one')}}
+
+    {{#if IsJoinTypeUUID}}
+      @Column({ type: 'uuid' })
+      {{camelCase RelatedEntityLower}}Id:
+      {{JoinType}};
+    {{else}}
+      @Column()
+      {{camelCase RelatedEntityLower}}Id:
+      {{JoinType}};
+    {{/if}}
+
     @ManyToOne(() =>
     {{PascalCase RelatedEntity}}, ({{camelCase RelatedEntityLower}}) =>
     {{camelCase RelatedEntityLower}}.{{camelCase ForeignKey}})

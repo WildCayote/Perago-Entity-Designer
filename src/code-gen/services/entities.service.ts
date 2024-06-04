@@ -91,6 +91,10 @@ export class EntitiesService {
 
             RelationshipType: relation.type,
             Type: column.type,
+            JoinType: relation.referencedColumn.type,
+            IsJoinTypeUUID:
+              relation.referencedColumn.isPrimary &&
+              relation.referencedColumn.type.toLowerCase().trim() === 'string',
           };
         }),
     );
