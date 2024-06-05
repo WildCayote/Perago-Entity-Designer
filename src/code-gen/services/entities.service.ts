@@ -77,7 +77,10 @@ export class EntitiesService {
             model.columns.find((col) => col.id === relation.referencedColumnId),
           );
           return {
-            ForeignKey: relation.referencedColumn.name,
+            ForeignKey:
+              relation.referencedColumn.relation.name === ''
+                ? relation.referencedColumn.name
+                : relation.referencedColumn.relation.name,
             RelatedEntity:
               relatedEntity.name.charAt(0).toUpperCase() +
               relatedEntity.name.slice(1),
