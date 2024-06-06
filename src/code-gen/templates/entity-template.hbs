@@ -35,7 +35,7 @@ UpdateDateColumn } from 'typeorm';
   {{Nullable}},
   {{#if Unique}}
     unique: true,
-  {{/if}},
+  {{/if}}
   {{#if (eq Type 'jsonb')}}
     type: 'jsonb'
   {{/if}}
