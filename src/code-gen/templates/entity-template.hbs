@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column , JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 {{#each Relationships}}
   {{#if (eq RelationshipType 'many-to-one')}}
     import { ManyToOne } from 'typeorm'; import {
@@ -105,4 +105,10 @@ import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
 
   {{/if}}
 {{/each}}
+
+@CreateDateColumn()
+    createdAt: Date;
+
+@UpdateDateColumn()
+    updatedAt: Date;
 }
