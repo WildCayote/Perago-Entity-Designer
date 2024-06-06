@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsBoolean, IsOptional, IsArray, IsEnum } from
+import { IsString, IsNumber, IsBoolean, IsOptional, IsArray, } from
 'class-validator'; import { PartialType } from '@nestjs/mapped-types'; export
 class Create{{PascalCase ClassName}}Dto {
 {{#each Properties}}
@@ -14,15 +14,17 @@ class Create{{PascalCase ClassName}}Dto {
   {{#if (eq Type 'array')}}
     @IsArray() @ApiProperty()
   {{/if}}
-  {{#if (eq Type 'enum')}}
-    @IsEnum({{EnumName}})
-  {{/if}}
+
   {{#if Optional}}
     @IsOptional()
   {{/if}}
 
   {{Name}}:
-  {{Type}};
+  {{#if (eq Type 'jsonb')}}
+    any;
+  {{else}}
+    {{Type}};
+  {{/if}}
 {{/each}}
 } export class Update{{PascalCase ClassName}}Dto extends PartialType(Create{{PascalCase
   ClassName

@@ -34,10 +34,17 @@ import { Entity, PrimaryGeneratedColumn, Column , JoinColumn } from 'typeorm';
   {{Nullable}},
   {{#if Unique}}
     unique: true,
-  {{/if}}
+  {{/if}},
+  {{#if (eq(Type 'jsonb'))}}
+   type: 'jsonb'
+   {{/if}}   
   })
   {{camelCase Name}}:
+  {{#if (eq(Type 'jsonb'))}}
+  any;
+  {{else}}
   {{Type}};
+  {{/if}}
 {{/each}}
 
 {{#each Relationships}}
