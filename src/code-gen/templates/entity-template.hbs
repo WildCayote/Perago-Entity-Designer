@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column , JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column , JoinColumn, CreateDateColumn,
+UpdateDateColumn } from 'typeorm';
 {{#each Relationships}}
   {{#if (eq RelationshipType 'many-to-one')}}
     import { ManyToOne } from 'typeorm'; import {
@@ -35,15 +36,15 @@ import { Entity, PrimaryGeneratedColumn, Column , JoinColumn, CreateDateColumn, 
   {{#if Unique}}
     unique: true,
   {{/if}},
-  {{#if (eq(Type 'jsonb'))}}
-   type: 'jsonb'
-   {{/if}}   
+  {{#if (eq Type 'jsonb')}}
+    type: 'jsonb'
+  {{/if}}
   })
   {{camelCase Name}}:
-  {{#if (eq(Type 'jsonb'))}}
-  any;
+  {{#if (eq Type 'jsonb')}}
+    any;
   {{else}}
-  {{Type}};
+    {{Type}};
   {{/if}}
 {{/each}}
 
@@ -106,9 +107,4 @@ import { Entity, PrimaryGeneratedColumn, Column , JoinColumn, CreateDateColumn, 
   {{/if}}
 {{/each}}
 
-@CreateDateColumn()
-    createdAt: Date;
-
-@UpdateDateColumn()
-    updatedAt: Date;
-}
+@CreateDateColumn() createdAt: Date; @UpdateDateColumn() updatedAt: Date; }

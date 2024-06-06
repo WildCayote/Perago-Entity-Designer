@@ -20,7 +20,7 @@ export class CreateColumnDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  @IsIn(['string', 'number', 'bool', 'jsonb'])
+  @IsIn(['string', 'number', 'bool', 'jsonb', 'any', 'Date'])
   type: string;
 
   @ApiProperty()
