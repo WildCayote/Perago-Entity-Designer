@@ -64,44 +64,58 @@ export class EntitiesService {
       model.columns
         .filter((column) => column.isForiegn || column.references.length > 0)
         .map(async (column) => {
-          const relation = await this.relationItemRepository.findOne({
+          const relations = await this.relationItemRepository.find({
             where: {
               columnId: column.id,
             },
             relations: ['referencedColumn'],
           });
 
-          console.log('*********** ', column.name, ' ********', relation);
+          return [
+            ...relations.map((relation) => {
+              console.log('*********** ', column.name, ' ********', relation);
 
-          const relatedEntity = this.allModels.find((model) =>
-            model.columns.find((col) => col.id === relation.referencedColumnId),
-          );
-          return {
-            ForeignKey:
-              relation.referencedColumn.relation.name === ''
-                ? relation.referencedColumn.name
-                : relation.referencedColumn.relation.name,
-            RelatedEntity:
-              relatedEntity.name.charAt(0).toUpperCase() +
-              relatedEntity.name.slice(1),
+              const relatedEntity = this.allModels.find((model) =>
+                model.columns.find(
+                  (col) => col.id === relation.referencedColumnId,
+                ),
+              );
+              return {
+                ForeignKey:
+                  relation.referencedColumn.relation[0].name === ''
+                    ? relation.referencedColumn.name
+                    : relation.referencedColumn.relation[0].name,
+                RelatedEntity:
+                  relatedEntity.name.charAt(0).toUpperCase() +
+                  relatedEntity.name.slice(1),
 
-            RelatedEntityLower:
-              relatedEntity.name.charAt(0).toLowerCase() +
-              relatedEntity.name.slice(1),
+                RelatedEntityLower:
+                  relatedEntity.name.charAt(0).toLowerCase() +
+                  relatedEntity.name.slice(1),
 
-            Name: column.name,
-            ReversedName: relation.name == null ? '' : relation.name,
+                Name: column.name,
+                ReversedName: relation.name == null ? '' : relation.name,
 
-            RelationshipType: relation.type,
-            Type: column.type,
-            JoinType: relation.referencedColumn.type,
-            IsJoinTypeUUID:
-              relation.referencedColumn.isPrimary &&
-              relation.referencedColumn.type.toLowerCase().trim() === 'string',
-          };
+                RelationshipType: relation.type,
+                Type: column.type,
+                JoinType: relation.referencedColumn.type,
+                IsJoinTypeUUID:
+                  relation.referencedColumn.isPrimary &&
+                  relation.referencedColumn.type.toLowerCase().trim() ===
+                    'string',
+              };
+            }),
+          ];
         }),
     );
     console.log('relationships: ', relationships);
+
+    const allRelationships = [];
+    relationships.forEach((relationship) => {
+      relationship.forEach((rel) => {
+        allRelationships.push(rel);
+      });
+    });
 
     const table = {
       ClassName: model.name,
@@ -111,7 +125,7 @@ export class EntitiesService {
       PrimaryKey: primaryKey.name,
       PrimaryKeyType: primaryKey.type,
       Properties: properties,
-      Relationships: relationships,
+      Relationships: allRelationships,
     };
 
     return this.handlebarsService.compileTemplate(this.entityTemplate, table);

@@ -42,17 +42,17 @@ export class Columns {
   @JoinColumn({ name: 'model_id', referencedColumnName: 'id' })
   model: Model;
 
-  @OneToOne((type) => RelationShip, (relationship) => relationship.column, {
+  @OneToMany((type) => RelationShip, (relationship) => relationship.column, {
     nullable: true,
     eager: true,
-    onDelete : 'CASCADE'
+    onDelete: 'CASCADE',
   })
   relation: RelationShip;
 
   @OneToMany(
     (type) => RelationShip,
     (relationship) => relationship.referencedColumn,
-    { eager: true , onDelete :'CASCADE'},
+    { eager: true, onDelete: 'CASCADE' },
   )
   references: RelationShip[];
 }

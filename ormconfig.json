@@ -4,8 +4,8 @@
   "port": 5433,
   "username": "postgres",
   "password": "dawit",
-  "database": "database_design",
-  "synchronize": false,
+  "database": "perago_db_design",
+  "synchronize": true,
   "entities": [
     "dist/**/*.entity{.ts,.js}"
   ]

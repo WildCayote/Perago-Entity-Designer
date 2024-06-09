@@ -30,14 +30,18 @@ export class RelationShip {
   @Column({ name: 'columnId' })
   columnId: string;
 
-  @OneToOne((type) => Columns, (column) => column.relation , {onDelete : 'CASCADE'})
+  @ManyToOne((type) => Columns, (column) => column.relation, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'columnId', referencedColumnName: 'id' })
   column: Columns;
 
   @Column({ name: 'referencedColumnId' })
   referencedColumnId: string;
 
-  @ManyToOne((type) => Columns, (column) => column.references , {onDelete : 'CASCADE'})
-  @JoinColumn({ name: 'referencedColumnId', referencedColumnName: 'id' } ,)
+  @ManyToOne((type) => Columns, (column) => column.references, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'referencedColumnId', referencedColumnName: 'id' })
   referencedColumn: Columns;
 }

@@ -6,6 +6,7 @@ import { promisify } from 'util';
 
 import { CodeGenService } from 'src/code-gen/code-gen.service';
 import { PgBossGateway } from './pg-boss.gateway';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PgBossService {
@@ -14,9 +15,11 @@ export class PgBossService {
     private codeGenService: CodeGenService,
     // private barrelGenService: BarrelGenService,
     private pgBossGateway: PgBossGateway,
+    // private configService: ConfigService,
   ) {
     this.boss = new PgBoss(
-      'postgres://postgres:dawit@localhost:5433/database_design',
+      // this.configService.get('DATABASE_URL'),
+      'postgres://postgres:dawit@localhost:5433/perago_db_design',
     );
   }
 
